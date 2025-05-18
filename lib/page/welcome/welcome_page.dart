@@ -30,7 +30,7 @@ class _WelcomePageState extends State<WelcomePage>  with WindowListener{
   void initState() {
     super.initState();
     // 延迟
-    Future.delayed(Duration(milliseconds: Platform.isAndroid?300:800), () {
+    Future.delayed(Duration(milliseconds: Platform.isAndroid?0:800), () {
       Future.microtask(() async {
         bool? isUserPrivateAgree = await Settings.getValue<bool>(SettingsConfig.isUserPrivateAgree, defaultValue: false);
         if (isUserPrivateAgree?? false) {

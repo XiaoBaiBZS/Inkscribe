@@ -43,7 +43,7 @@ class _AllFilesPageState extends State<AllFilesPage> {
   Widget buildBookCover(FileSystemNode fileSystemNode) {
     if(fileSystemNode.isDirectory){
       DirectoryNode fileNode = fileSystemNode as DirectoryNode;
-      return  IconButton(
+      return IconButton(
           style: ButtonStyle(padding: ButtonState.all(EdgeInsets.zero),),
           icon: Container(
             decoration: BoxDecoration(
@@ -363,9 +363,7 @@ class _AllFilesPageState extends State<AllFilesPage> {
                             child: Column(
                               children: [
                                 Image.asset("assets/no_file_tip.png",width: (MediaQuery.of(context).size.height-300)/2,height: (MediaQuery.of(context).size.height-300)/2),
-
                                 Text("暂无笔记",style: TextStyle(fontSize: 18),)
-
                               ],
                             ),
                           ),

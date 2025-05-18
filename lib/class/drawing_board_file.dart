@@ -64,7 +64,7 @@ class DrawingBoardFileConfig {
 /// 画板全部信息
 class DrawingBoardFile extends DrawingBoardFileConfig {
   /// 数据
-  late String data;
+  late List<String> data;
 
   DrawingBoardFile({
     required this.data,
@@ -80,17 +80,22 @@ class DrawingBoardFile extends DrawingBoardFileConfig {
       "path": path,
       "type": type,
       "createDateTime": createDateTime.toIso8601String(),
-      "data": data
+      "data":jsonEncode(data),
     };
   }
 
   factory DrawingBoardFile.fromMap(Map<String, dynamic> map) {
+    // 解析 JSON 字符串为 List<String>
+    final dynamic rawData = map['data'] ?? '[]';
+    final List<dynamic> dataList = jsonDecode(rawData.toString());
     return DrawingBoardFile(
       name: map['name'],
       path: map['path'],
       type: map['type'],
       createDateTime: DateTime.parse(map['createDateTime']),
-      data: map['data'],
+      data: dataList.map((e) => e.toString()).toList(),
+      // data: map['data'],
+      // data: jsonDecode(map['data']),
     );
   }
 

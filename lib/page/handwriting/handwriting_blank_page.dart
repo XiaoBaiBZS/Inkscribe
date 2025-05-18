@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
@@ -74,15 +75,25 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
   /// 是否已经加载画板
   bool _isExecuted = false;
 
+  /// 当前画板页面索引
+  int _nowPageIndex = 0;
+
+  /// 当前画板总数据
+  List<String> _drawingBoardData = [];
+  
+  /// 当前画板文件相对路径
+  String _filePath = '';
+
   /// 创建文件对象
   void _createFile(String path) async {
     DateTime now = DateTime.now();
+    _drawingBoardData.add( _drawingController.getJsonList().toString());
     _drawingBoardFile  = DrawingBoardFile(
       name: "未命名笔记",
       path: "$path/${now.millisecondsSinceEpoch}.json",
       type: "normal",
       createDateTime: now,
-      data: _drawingController.getJsonList().toString(),
+      data: _drawingBoardData,
     );
     fileTreeManager.addFile(DrawingBoardFileConfig.fromDrawingBoardFile(_drawingBoardFile),directoryPath: path);
     fileTreeManager.writeToConfigFile();
@@ -91,6 +102,7 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
 
   /// 保存笔记文件
   void _saveFile() async {
+    _drawingBoardFile.data = _drawingBoardData;
     _drawingBoardFile.saveFile();
   }
 
@@ -144,9 +156,7 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
                   onPressed: () {
                     _inkscribe_controller.showFlyout(
                       builder: (context) => FlyoutContent(
-
                         padding: EdgeInsets.zero,
-
                         child: StatefulBuilder(builder:
                             (BuildContext context, StateSetter setState) {
                           return Acrylic(
@@ -726,20 +736,70 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
                   ),
                 ),
 
-                // 画笔粗细调整按钮
-                // SizedBox(
-                //   height: 50,
-                //   width: 50,
-                //   child: IconButton(
-                //     icon: Icon(FluentIcons.pentagon),
-                //     onPressed: () {
-                //       _showPenWidthDialog();
-                //     },
-                //   ),
-                // ),
+
               ],
             ),
             Expanded(child: Container()),
+            SizedBox(
+              height: 50,
+              width: 50,
+              child: IconButton(
+                icon: Icon(FluentIcons.chevron_left),
+                style: ButtonStyle(
+                    backgroundColor: ButtonState.all(
+                       FluentTheme.of(context).micaBackgroundColor
+                    ),
+                ),
+                onPressed:_nowPageIndex<=0?null:(){
+                  // 保存当前页面内容
+                  _drawingBoardData[_nowPageIndex] = jsonEncode(_drawingController.getJsonList());
+                  _drawingController.clear();
+                  // 如果下一页的预计角标超出存储数据的列表长度，则给列表添加一项，否则则去本地文件中读取下一页数据
+                  setState(() {
+                    _nowPageIndex--;
+                  });
+                  _loadPage();
+                }
+              ),
+            ),
+            SizedBox(
+              height: 50,
+
+              child: IconButton(
+                icon: Text("${_nowPageIndex+1} / ${_drawingBoardData.length}"),
+                onPressed: () {
+
+                },
+              ),
+            ),
+            SizedBox(
+              height: 50,
+              width: 50,
+              child: IconButton(
+                icon: (_nowPageIndex==_drawingBoardData.length-1)?Icon(FluentIcons.add):Icon(FluentIcons.chevron_right),
+                style: ButtonStyle(
+                  backgroundColor: ButtonState.all(
+                      FluentTheme.of(context).micaBackgroundColor
+                  ),
+                ),
+                onPressed: () {
+                  // 保存当前页面内容
+                  _drawingBoardData[_nowPageIndex] = jsonEncode(_drawingController.getJsonList());
+                  _drawingController.clear();
+                  // 如果下一页的预计角标超出存储数据的列表长度，则给列表添加一项，否则则去本地文件中读取下一页数据
+                  setState(() {
+                    _nowPageIndex++;
+                  });
+                  if((_nowPageIndex)>(_drawingBoardData.length-1)){
+                    _drawingBoardData.add("");
+                  }else{
+                    _loadPage();
+                  }
+
+
+                },
+              ),
+            ),
             Platform.isWindows ?
             SizedBox(
               height: 50,
@@ -916,7 +976,35 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
       return;
     }
     _drawingBoardFile = DrawingBoardFile.fromMap(jsonDecode(await FileUtil.readFile("$path/$filePath")));
-    jsonDecode(_drawingBoardFile.data).forEach((element) {
+    setState((){
+      _drawingBoardFile;
+      _drawingBoardData = _drawingBoardFile.data;
+    });
+    jsonDecode(_drawingBoardFile.data[_nowPageIndex]).forEach((element) {
+      switch(element["type"]){
+        case "StraightLine":
+          _drawingController.addContent(StraightLine.fromJson(element));
+          break;
+        case "SimpleLine":
+          _drawingController.addContent(SimpleLine.fromJson(element));
+          break;
+        case "SmoothLine":
+          _drawingController.addContent(SmoothLine.fromJson(element));
+          break;
+        case "Eraser":
+          _drawingController.addContent(Eraser.fromJson(element));
+          break;
+        case "Rectangle":
+          _drawingController.addContent(Rectangle.fromJson(element));
+          break;
+        case "Circle":
+          _drawingController.addContent(Circle.fromJson(element));
+          break;
+      }
+    });
+  }
+  void _loadPage() async {
+    jsonDecode(_drawingBoardData[_nowPageIndex]).forEach((element) {
       switch(element["type"]){
         case "StraightLine":
           _drawingController.addContent(StraightLine.fromJson(element));
@@ -940,7 +1028,6 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
     });
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -962,8 +1049,8 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
     _drawingController.realPainter?.addListener(() {
       _updateUndoState();
       _updateRedoState();
-      _drawingBoardFile.data = jsonEncode(_drawingController.getJsonList());
-
+      // _drawingBoardData[_nowPageIndex] = jsonEncode(_drawingController.getJsonList());
+      _drawingBoardFile.data = _drawingBoardData;
     });
     // 设置默认画笔为模拟压感笔，模拟压感灵敏度为0.1
     _drawingController.setPaintContent(SmoothLine(brushPrecision: 0.1));
