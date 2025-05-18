@@ -16,6 +16,7 @@ import 'package:inksrcibe/util/file_util.dart';
 import 'package:inksrcibe/util/info_bar_util.dart';
 import 'package:inksrcibe/util/route/route_util.dart';
 import 'package:inksrcibe/util/route/routes.dart';
+import 'package:pdfrx/pdfrx.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:math' as math;
 import '../../config/settings_config.dart';
@@ -213,7 +214,7 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
                 ),
               ),
             ),
-            const SizedBox(width: 20),
+
             Expanded(child: Container()),
             Row(
               children: [
@@ -1152,7 +1153,14 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
                         });
                       },
                       // 画布背景，这里是默认的黑板背景
-                      background: Container(
+                      background:
+                      // SizedBox(
+                      //   width: MediaQuery.of(context).size.width,
+                      //   height: MediaQuery.of(context).size.height,
+                      //   // child:  PdfViewer.file("/storage/emulated/0/Download/WeiXin/你好.pdf"),
+                      //   child:  PdfViewer.file("C:/Users/12985/Downloads/你好.pdf"),
+                      // )
+                      Container(
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height,
                         color: Color(0xff264b42),

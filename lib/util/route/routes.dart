@@ -3,6 +3,7 @@ import 'package:inksrcibe/page/handwriting/handwriting_blank_page.dart';
 import 'package:inksrcibe/page/home/home_page.dart';
 import 'package:inksrcibe/page/welcome/welcome_private_policy_page.dart';
 import 'package:inksrcibe/page/welcome/welcome_setting_page.dart';
+import 'package:inksrcibe/test/pdf.dart';
 
 /**
  *@Author: ZhanshuoBai
@@ -24,6 +25,8 @@ class Routes {
         return pageRoute(WelcomePrivatePolicyPage(), settings: settings);
       case RoutePath.handwriting_blank_page:
         return pageRoute(HandwritingBlankPage(), settings: settings);
+      case RoutePath.pdf:
+        return pageRoute(MyBrowser(), settings: settings);
 
 
     }
@@ -57,5 +60,6 @@ class RoutePath {
   static const String welcome_setting_page = "/welcome/welcome_setting_page";
   static const String welcome_private_policy_page = "/welcome/welcome_private_policy_page";
   static const String handwriting_blank_page = "/handwriting/handwriting_blank_page";
+  static const String pdf = "/test/pdf";
 
 }

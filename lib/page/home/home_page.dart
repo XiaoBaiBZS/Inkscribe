@@ -43,7 +43,11 @@ class _HomePageState extends State<HomePage> {
       PaneItem(
         icon: const Icon(FluentIcons.settings),
         title: const Text('设置'),
-        body: Container(),
+        body: Container(
+          child: FilledButton(child: Text("pdf"), onPressed: (){
+            RouteUtils.pushForNamed(context, RoutePath.pdf);
+          }),
+        ),
       ),
       PaneItem(
         icon: const Icon(FluentIcons.help),
