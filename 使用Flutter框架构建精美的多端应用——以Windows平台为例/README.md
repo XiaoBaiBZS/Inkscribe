@@ -1,21 +1,25 @@
+# 使用Flutter框架构建精美的多端应用——以Windows平台为例
 白展硕 2025年4月27日开始 浙江·杭州 Zhanshuo.Bai@outlook.com
 # 前言
 ## 最佳实践
 实现一个以Windows平台为主的手写笔笔记应用
 ## 项目背景
+
 ## 特殊说明
 1. 由于项目实际上以 Windows 平台为主，那么就意味着我需要尽量以 Microsoft 官方推荐的 WinUI3 样式开发，那将必然舍弃一部分对于 Android 平台的适配。比如：无法在 Android 平台使用 Material Design 样式。我们在本项目中尽量选择全平台支持的依赖（插件）。但是很难保证所有的依赖在各个平台都能正常运行，我们会优先保证在Windows平台的效果。
 2. 项目本身处于学习研究目的，可能会与文档有些许出入。
 3. 本文档参考了一部分互联网媒体和官方提供的资料。
 4. 尝试使用 `GestureDetector` 触摸类做了一个简单的演示，发现效果一般，延时很高，而且笔迹不够连贯毛刺像素比较多，所以采用一个封装集成度比较高的库 `flutter_drawing_board: ^0.8.1` 来实现手写的功能。
-5. 本文部分内容使用人工智能大模型生成
+5. 本文部分内容使用人工智能大模型生成。
+6. 本文档是对开源项目`Inkscribe·墨痕题镌`的解释。
+# 开源链接
+https://github.com/XiaoBaiBZS/Inkdcribe
 # 参考文档
 https://docs.flutter.cn/get-started/install/windows/desktop/
-
 # 基本环境
 1. 编辑器：Android Studio Giraffe | 2022.3.1 Patch 4
 2. Flutter SDK：3.24.3
-注意：我们接下来用到的 fluent_ui 依赖的最近版本 4.11.3 的最低 Flutter SDK 版本是3.27.0，为了研究方便，下文将使用 fluent_ui 4.9.2 版本。
+   注意：我们接下来用到的 fluent_ui 依赖的最近版本 4.11.3 的最低 Flutter SDK 版本是3.27.0，为了研究方便，下文将使用 fluent_ui 4.9.2 版本。
 
 >**配置文本编辑器或 IDE**
 你可以使用任意文本编辑器或集成开发环境 (IDE)，并结合 Flutter 的命令行工具，来使用 Flutter 构建应用程序。
@@ -27,14 +31,14 @@ https://docs.flutter.cn/get-started/install/windows/desktop/
 > [IntelliJ IDEA](https://www.jetbrains.com/help/idea/installation-guide.html) 2024.1 或更高版本使用 [Flutter plugin for IntelliJ](https://plugins.jetbrains.com/plugin/9212-flutter)
 # 我的设备
 - `Windows Platform`：Lenovo Thinkbook 16p Gen4 用于开发和调试
-	- 处理器：13th Gen Intel i9-13900H
-	- 显示卡：NVIDIA GeForce RTX 4060 Laptop GPU
-	- 内存：32Gb
-	- 操作系统：Windows 11 23H1 家庭版
+    - 处理器：13th Gen Intel i9-13900H
+    - 显示卡：NVIDIA GeForce RTX 4060 Laptop GPU
+    - 内存：32Gb
+    - 操作系统：Windows 11 23H1 家庭版
 - `Android Platform`：HUAWEI MatePad Pro 2020 MRX-W09 用于调试
-	- 处理器：HUAWEI Kirin 990
-	- 运行内存：8Gb
-	- 操作系统：HarmonyOS 4.2.0（适配Android 10）
+    - 处理器：HUAWEI Kirin 990
+    - 运行内存：8Gb
+    - 操作系统：HarmonyOS 4.2.0（适配Android 10）
 # 一些名词和解释
 ## 依赖 与 插件
 在 Flutter 里，“依赖” 和 “插件” 这两个术语有不同的侧重点，不过它们都用于描述项目里引入的外部代码资源。本文中将不区分二者区别。
@@ -105,7 +109,7 @@ class MyApp extends StatelessWidget {
 
 最直白的说，你能看到的所有页面都是由一个个Widget构成的，绘制页面布局的过程就是你将不同的Widget嵌套组合成组件树的过程。
 ## 有状态组件和无状态组件
-无状态组件：StatelessWidget 
+无状态组件：StatelessWidget
 有状态组件：StatefulWidget
 
 最直白的说，当你创建好一个应用后往往示例中的`MyApp`继承自无状态组件，其他情况下基本上你都会使用有状态组件。当然你也可以通过更改让你的`MyApp`也继承自有状态组件，这可能更便于你更改全局的主题和设置。你看到的一些不会改变值的文本框、按钮等往往是无状态组件。
@@ -222,7 +226,7 @@ class _WindowsTestPageState extends State<WindowsTestPage> {
 # 2. 欢迎页面
 在用户第一次进入应用的时候显示欢迎页面，用于显示应用合规，实现效果如下：![[648a4445580aef3daacd7f56f43df7e9.png]]
 顶部有一个AppLogo，然后又一段欢迎语，底部显示公司组织。只不过我们需要把中间的“稍等一分钟”换成我们的隐私合规。
-在这一章节中我们将学习`FluentApp`、`ScaffoldPage`两个组件以及使用`window_manager`依赖。 
+在这一章节中我们将学习`FluentApp`、`ScaffoldPage`两个组件以及使用`window_manager`依赖。
 ## `window_manager`依赖
 `window_manager` 是一个 Flutter 插件，用于管理 Windows 平台上的窗口，比如设置窗口大小、位置、标题栏样式等。
 ### 引入依赖
@@ -1115,7 +1119,7 @@ Settings.setValue(workspacePathKey, result);
 首先，让我们创建一个`welcome_setting_page.dart`页面，并修改`welcome_page.dart`同意跳转的按钮指向`welcome_setting_page.dart`。完整代码可参考本节最后，此处仅写出部分代码。
 1. 创建`/welcome/welcome_setting_page.dart`，并写出基本stf框架。
 2. 在`/route/routes.dart`中添加路径，修改后的路径跳转类完整代码如下。
-`/route/routes.dart`
+   `/route/routes.dart`
 ```dart
 import 'package:fluent_ui/fluent_ui.dart';  
 import 'package:inksrcibe/page/home/home_page.dart';  
@@ -1179,7 +1183,7 @@ FilledButton(
 ),
 ```
 4. 编写文件夹选择器功能
-首先引入依赖
+   首先引入依赖
 ```yaml
 flutter_settings_screens: ^0.3.4  
 shared_preferences: ^2.5.3
@@ -1234,8 +1238,8 @@ void initState() {
 }
 ```
 上述的部分代码旨在一个提示思路，如果直接进行修改可能有很多报错，您可以在理解上述代码的作用后根据你自己的项目做调整，下面是至此的完整代码，可供参考。
- #### 完整代码
- ##### `main.dart`
+#### 完整代码
+##### `main.dart`
  ```dart
 import 'package:fluent_ui/fluent_ui.dart';  
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';  
@@ -1656,7 +1660,7 @@ const NavigationView({
 - `this.transitionBuilder`：用于定义导航视图在不同状态（如展开、收起）之间切换时的过渡效果，通过自定义过渡构建器，可以实现各种动画效果，使界面切换更加流畅和美观。
 - `this.paneBodyBuilder`：是一个函数，用于构建导航窗格的主体内容。可以根据具体需求在函数中返回不同的组件，以定制导航窗格的显示内容和布局。
 - `this.onDisplayModeChanged`：当导航视图的显示模式（如全屏、侧边栏模式等）发生改变时会调用此回调函数，可在函数中根据新的显示模式进行相应的布局调整或其他操作。
-我们这里主要使用appBar和pane两个属性值，首先让我们看一下appBar，appBar应是一个`NavigationAppBar`组件，让我们看一下`NavigationAppBar`属性。
+  我们这里主要使用appBar和pane两个属性值，首先让我们看一下appBar，appBar应是一个`NavigationAppBar`组件，让我们看一下`NavigationAppBar`属性。
 ```dart
 const NavigationAppBar({  
   this.key,  
@@ -1674,7 +1678,7 @@ const NavigationAppBar({
 - `automaticallyImplyLeading`：布尔值，默认值为`true`。当为`true`时，如果`leading`属性没有被设置，会自动根据平台和上下文等情况显示一个默认的返回按钮或其他合适的引导图标；如果为`false`，则不会自动显示默认的`leading` Widget。
 - `height`：导航栏的高度，默认值为`_kDefaultAppBarHeight`，可以根据实际需求自定义导航栏的高度。
 - `backgroundColor`：导航栏的背景颜色，如果不设置，会使用主题中的默认导航栏背景颜色。
-我们可以让`DragToMoveArea`包裹顶栏，这样，就可以用鼠标拖拽顶栏移动窗口了。再说说pane，panel应当是一个`NavigationPane`组件，这个组件有几个关键属性，`selected`属性是侧边导航栏的索引，表示当前侧边栏的选项卡所处位置。`onChanged`函数可以帮助更新组件状态，当侧边栏选项卡切换的时候更新`selected`。`displayMode`属性可以设置侧边栏的展开状态分别可以设置`PaneDisplayMode.auto`、`PaneDisplayMode.open`、`PaneDisplayMode.minial`、`PaneDisplayMode.compact`、`PaneDisplayMode.top`几个枚举。
+  我们可以让`DragToMoveArea`包裹顶栏，这样，就可以用鼠标拖拽顶栏移动窗口了。再说说pane，panel应当是一个`NavigationPane`组件，这个组件有几个关键属性，`selected`属性是侧边导航栏的索引，表示当前侧边栏的选项卡所处位置。`onChanged`函数可以帮助更新组件状态，当侧边栏选项卡切换的时候更新`selected`。`displayMode`属性可以设置侧边栏的展开状态分别可以设置`PaneDisplayMode.auto`、`PaneDisplayMode.open`、`PaneDisplayMode.minial`、`PaneDisplayMode.compact`、`PaneDisplayMode.top`几个枚举。
  `PaneDisplayMode.auto`
 - **描述**：自动根据窗口大小和平台特性选择最合适的显示模式。
 - **行为**：
@@ -1682,31 +1686,31 @@ const NavigationAppBar({
     - 在中等屏幕上，可能表现为 `compact` 模式（仅显示图标）。
     - 在小屏幕上，可能表现为 `minimal` 或 `top` 模式（顶部导航或折叠式菜单）。
 - **适用场景**：希望界面能自适应不同设备尺寸时使用。
-`PaneDisplayMode.open`
+  `PaneDisplayMode.open`
 - **描述**：侧边栏完全展开，同时显示图标和文本标签。
 - **行为**：
     - 侧边栏占据固定宽度（通常较宽）。
     - 菜单项显示完整的图标和文本。
 - **适用场景**：桌面端或大屏幕设备，用户需要快速识别导航项的名称。
-`PaneDisplayMode.minimal`
+  `PaneDisplayMode.minimal`
 - **描述**：侧边栏仅在鼠标悬停时展开，平时只显示一个窄条。
 - **行为**：
     - 默认状态下，侧边栏收缩为一条窄边（仅显示极少内容）。
     - 鼠标悬停时，侧边栏展开并显示完整内容。
 - **适用场景**：需要最大化内容区域，同时保留侧边栏导航功能的场景（如代码编辑器）。
-`PaneDisplayMode.compact`
+  `PaneDisplayMode.compact`
 - **描述**：侧边栏始终显示，但仅展示图标，不显示文本标签。
 - **行为**：
     - 侧边栏宽度较窄，仅容纳图标。
     - 文本标签仅在用户悬停时显示（通常以工具提示形式）。
 - **适用场景**：需要节省空间，但仍希望导航栏常驻的场景（如笔记本电脑或平板）。
-`PaneDisplayMode.top`
+  `PaneDisplayMode.top`
 - **描述**：导航项显示在顶部，而非侧边。
 - **行为**：
     - 导航项以水平方式排列在应用顶部。
     - 通常与 `NavigationAppBar` 结合使用。
 - **适用场景**：移动设备或垂直空间有限的界面（如手机应用）。
-items里面是一个`List<NavigationPaneItem>`，列表每个子项是`PaneItem`，`PaneItem`继承自`NavigationPaneItem`。
+  items里面是一个`List<NavigationPaneItem>`，列表每个子项是`PaneItem`，`PaneItem`继承自`NavigationPaneItem`。
 ```dart
 PaneItem({  
   super.key,  
@@ -1941,23 +1945,23 @@ void setStyle({
 })
 ```
 1. **`BlendMode? blendMode`**：  
-    这个参数用于指定绘制内容与已存在内容的混合模式。常见的混合模式有`srcOver`（默认值，新内容覆盖在旧内容之上）、`multiply`（正片叠底，颜色相乘）、`screen`（滤色，颜色变亮）等。
+   这个参数用于指定绘制内容与已存在内容的混合模式。常见的混合模式有`srcOver`（默认值，新内容覆盖在旧内容之上）、`multiply`（正片叠底，颜色相乘）、`screen`（滤色，颜色变亮）等。
 2. **`Color? color`**：  
-    该参数用于设置绘制的颜色。若未设置，会使用默认颜色，不过一般不建议使用默认值。
+   该参数用于设置绘制的颜色。若未设置，会使用默认颜色，不过一般不建议使用默认值。
 3. **`ColorFilter? colorFilter`**：  
-    它的作用是对绘制内容应用颜色滤镜。可以实现如黑白效果、色调调整等功能。
+   它的作用是对绘制内容应用颜色滤镜。可以实现如黑白效果、色调调整等功能。
 4. **`FilterQuality? filterQuality`**：  
-    此参数用于指定滤镜的质量，可选值有`none`（无滤波，速度最快但质量最差）、`low`（低质量，速度较快）、`medium`（中等质量）、`high`（高质量，速度最慢但效果最佳）。
+   此参数用于指定滤镜的质量，可选值有`none`（无滤波，速度最快但质量最差）、`low`（低质量，速度较快）、`medium`（中等质量）、`high`（高质量，速度最慢但效果最佳）。
 5. **`ui.ImageFilter? imageFilter`**：  
-    用于对绘制内容应用图像滤镜，像模糊、阴影等效果都可以通过它来实现。
+   用于对绘制内容应用图像滤镜，像模糊、阴影等效果都可以通过它来实现。
 6. **`bool? invertColors`**：  
-    这是一个布尔值参数，若设置为`true`，会对绘制内容进行颜色反转。
+   这是一个布尔值参数，若设置为`true`，会对绘制内容进行颜色反转。
 7. **`bool? isAntiAlias`**：  
-    同样是布尔值参数，设置为`true`时会启用抗锯齿功能，让边缘看起来更平滑。
+   同样是布尔值参数，设置为`true`时会启用抗锯齿功能，让边缘看起来更平滑。
 8. **`MaskFilter? maskFilter`**：  
-    该参数用于对绘制内容应用掩码滤镜，例如可以实现模糊边缘的效果。
+   该参数用于对绘制内容应用掩码滤镜，例如可以实现模糊边缘的效果。
 9. **`Shader? shader`**：  
-    用于设置着色器，借助着色器能够实现渐变、图案填充等复杂的填充效果。
+   用于设置着色器，借助着色器能够实现渐变、图案填充等复杂的填充效果。
 10. **`StrokeCap? strokeCap`**：  
     此参数用于指定线条端点的样式，可选值有`butt`（平头，默认值）、`round`（圆头）、`square`（方头）。
 11. **`StrokeJoin? strokeJoin`**：  
@@ -2098,6 +2102,7 @@ class _HomePageState extends State<HomePage> {
   }  
 }
 ```
+>由于代码数量增加，从本节起，将不会再提供完整代码，如需查看完整代码，可移步https://github.com/XiaoBaiBZS/Inkscribe/来获取
 # 7. 画布保存与导入
 ## 保存画板文件
 然后我们为了方便管理文件与文件夹，我们可以使用一个配置文件来进行存储，并通过序列化保存文件树，下面来详细介绍。画布控制器中有一个方法`List<Map<String, dynamic>> getJsonList()`，通过这个方法我们可以获取当前画布的绘制json序列，我们可以对这个json处理和保存，以及后续导入这个json加载画布。
@@ -2305,6 +2310,848 @@ class FileUtil {
       print('获取文件大小错误: $e');  
       rethrow;  
     }  
+  }  
+}
+```
+## 画板数据类
+为了能够更好的存储画布数据，我们初步构建了两个类，分别是画板基础数据类`DrawingBoardFileConfig`和画板完整数据类`class DrawingBoardFile extends DrawingBoardFileConfig`，因为画布的完整数据往往较大，全部保存在一个类的时候在主页面加载文件树将会读取全部数据，将会造成缓慢。所以我们剥离数据，让`DrawingBoardFileConfig`只保存部分数据用于展示，并将其`path`属性与全部数据连接。这样即可解决问题。
+```dart
+/// 画板基础信息  
+class DrawingBoardFileConfig {  
+  /// 画板文件名  
+  late String name;  
+  
+  /// 画板存放相对路径  
+  late String path;  
+  
+  /// 画板类型  
+  late String type = DrawingBoardType.normal;  
+  
+  /// 创建日期时间  
+  late DateTime createDateTime;  
+  
+  DrawingBoardFileConfig({  
+    required this.name,  
+    required this.path,  
+    required this.type,  
+    required this.createDateTime,  
+  });  
+  
+  Map<String, dynamic> toMap() {  
+    return {  
+      "name": name,  
+      "path": path,  
+      "type": type,  
+      "createDateTime": createDateTime.toIso8601String(),  
+    };  
+  }  
+  
+  factory DrawingBoardFileConfig.fromMap(Map<String, dynamic> map) {  
+    return DrawingBoardFileConfig(  
+      name: map['name'],  
+      path: map['path'],  
+      type: map['type'],  
+      createDateTime: DateTime.parse(map['createDateTime']),  
+    );  
+  }  
+  
+  factory DrawingBoardFileConfig.fromDrawingBoardFile(  
+      DrawingBoardFile drawingBoardFile) {  
+    return DrawingBoardFileConfig(  
+      name: drawingBoardFile.name,  
+      path: drawingBoardFile.path,  
+      type: drawingBoardFile.type,  
+      createDateTime: drawingBoardFile.createDateTime,  
+    );  
+  }  
+}  
+  
+/// 画板全部信息  
+class DrawingBoardFile extends DrawingBoardFileConfig {  
+  /// 数据  
+  late String data;  
+  
+  DrawingBoardFile({  
+    required this.data,  
+    required super.name,  
+    required super.path,  
+    required super.type,  
+    required super.createDateTime,  
+  });  
+  
+  Map<String, dynamic> toMap() {  
+    return {  
+      "name": name,  
+      "path": path,  
+      "type": type,  
+      "createDateTime": createDateTime.toIso8601String(),  
+      "data": data  
+    };  
+  }  
+  
+  factory DrawingBoardFile.fromMap(Map<String, dynamic> map) {  
+    return DrawingBoardFile(  
+      name: map['name'],  
+      path: map['path'],  
+      type: map['type'],  
+      createDateTime: DateTime.parse(map['createDateTime']),  
+      data: map['data'],  
+    );  
+  }  
+  
+  
+  void saveFile() async {  
+    String? workspacePath = Settings.getValue(SettingsConfig.workspacePath,defaultValue:  "");  
+    FileUtil.writeFile("$workspacePath$path", json.encode(toMap()));  
+  }  
+}  
+  
+/// 画板可选类型  
+class DrawingBoardType {  
+  static const String normal = "normal";  
+  static const String pdf = "pdf";  
+  static const String image = "image";  
+}
+```
+## 文件树状管理类
+我们要实现文件树状管理，就需要采用组合设计的模式，先让我们看看什么是组合设计模式。
+### 组合设计模式
+组合设计模式（Composite Design Pattern）是一种结构型设计模式，它允许你将对象组合成树形结构以表示 “部分 - 整体” 的层次关系。通过这种模式，客户端可以统一处理单个对象（叶子节点）和组合对象（容器节点）。
+### 最佳实践
+我们把文件和文件夹抽离出来，即都是文件系统的节点，通过属性`bool isDirectory`进行区分，文件节点用于存储`DrawingBoardFileConfig`，文件夹节点存储文件夹下的孩子。两者通过`String path`属性导航。下面是文件树系统抽象类：
+```dart
+/// 文件树系统相关类  
+abstract class FileSystemNode {  
+  String get name;  
+  String get path;  
+  bool get isDirectory;  
+  DateTime get createDateTime;  
+  
+  // 文件/目录操作  
+  void delete();  
+  void rename(String newName);  
+  
+  // 目录特有操作  
+  void addChild(FileSystemNode node);  
+  void removeChild(FileSystemNode node);  
+  List<FileSystemNode> get children;  
+}
+```
+再接着，我们对文件和文件夹的具体实现：
+```dart
+/// 文件夹节点  
+class DirectoryNode implements FileSystemNode {  
+  @override  
+  final String name;  
+  
+  @override  
+  final String path;  
+  
+  @override  
+  final bool isDirectory = true;  
+  
+  @override  
+  final DateTime createDateTime;  
+  
+  final List<FileSystemNode> _children = [];  
+  
+  DirectoryNode({  
+    required this.name,  
+    required this.path,  
+    DateTime? createDateTime,  
+  }) : createDateTime = createDateTime ?? DateTime.now();  
+  
+  @override  
+  void addChild(FileSystemNode node) {  
+    _children.add(node);  
+  }  
+  
+  @override  
+  void removeChild(FileSystemNode node) {  
+    _children.remove(node);  
+  }  
+  
+  @override  
+  List<FileSystemNode> get children => List.unmodifiable(_children);  
+  
+  @override  
+  void delete() {  
+    // 递归删除所有子节点  
+    for (var child in children) {  
+      child.delete();  
+    }  
+    _children.clear();  
+    // TODO: 删除物理目录  
+  }  
+  
+  @override  
+  void rename(String newName) {  
+    // TODO: 实现目录重命名逻辑  
+  }  
+}
+```
+```dart
+/// 文件节点  
+class FileNode implements FileSystemNode {  
+  @override  
+  final String name;  
+  
+  @override  
+  final String path;  
+  
+  @override  
+  final bool isDirectory = false;  
+  
+  @override  
+  final DateTime createDateTime;  
+  
+  final DrawingBoardFileConfig fileConfig;  
+  
+  FileNode(this.fileConfig)  
+      : name = fileConfig.name,  
+        path = fileConfig.path,  
+        createDateTime = fileConfig.createDateTime;  
+  
+  @override  
+  void delete() {  
+    // TODO: 删除物理文件  
+  }  
+  
+  @override  
+  void rename(String newName) {  
+    // TODO: 实现文件重命名逻辑  
+  }  
+  
+  @override  
+  void addChild(FileSystemNode node) {  
+    throw UnsupportedError("文件不能添加子节点");  
+  }  
+  
+  @override  
+  void removeChild(FileSystemNode node) {  
+    throw UnsupportedError("文件不能移除子节点");  
+  }  
+  
+  @override  
+  List<FileSystemNode> get children => [];  
+}
+```
+我们接着构建`FileTreeManager`类来管理文件节点，实现对应的操作：
+```dart
+/// 文件树管理  
+class FileTreeManager {  
+  final DirectoryNode root;  
+  
+  FileTreeManager({required String rootPath})  
+      : root = DirectoryNode(  
+    name: rootPath.split('/').last,  
+    path: rootPath,  
+  );  
+  
+  /// 添加文件到指定目录  
+  void addFile(DrawingBoardFileConfig fileConfig, {String? directoryPath}) {  
+    final directory = _findDirectory(directoryPath ?? root.path);  
+    final fileNode = FileNode(fileConfig);  
+    directory.addChild(fileNode);  
+  }  
+  
+  /// 创建新目录  
+  DirectoryNode createDirectory(String name, {String? parentPath}) {  
+    final parent = _findDirectory(parentPath ?? root.path);  
+    final newPath = '${parent.path}/$name';  
+  
+    final newDirectory = DirectoryNode(  
+      name: name,  
+      path: newPath,  
+    );  
+  
+    parent.addChild(newDirectory);  
+    return newDirectory;  
+  }  
+  
+  /// 查找目录  
+  DirectoryNode _findDirectory(String path) {  
+    if (path == root.path) return root;  
+  
+    // 实现目录查找逻辑  
+    List<String> pathComponents = path.split('/');  
+    DirectoryNode currentNode = root;  
+  
+    for (int i = 1; i < pathComponents.length; i++) {  
+      String component = pathComponents[i];  
+      bool found = false;  
+  
+      for (var child in currentNode.children) {  
+        if (child.isDirectory && child.name == component) {  
+          currentNode = child as DirectoryNode;  
+          found = true;  
+          break;  
+        }  
+      }  
+  
+      if (!found) {  
+        throw ArgumentError("目录不存在: $path");  
+      }  
+    }  
+  
+    return currentNode;  
+  }  
+  
+  /// 删除文件或目录  
+  void deleteNode(String path) {  
+    final components = path.split('/');  
+    final name = components.last;  
+    final parentPath = components.sublist(0, components.length - 1).join('/');  
+  
+    final parent = _findDirectory(parentPath);  
+  
+    for (var child in parent.children) {  
+      if (child.name == name) {  
+        parent.removeChild(child);  
+        child.delete();  
+        break;  
+      }  
+    }  
+  }  
+  
+  /// 获取目录内容  
+  List<FileSystemNode> getDirectoryContent(String path) {  
+    return _findDirectory(path).children;  
+  }  
+  
+  /// 将文件树转换为JSON  
+  Map<String, dynamic> toJson() {  
+    return _nodeToJson(root);  
+  }  
+  
+  Map<String, dynamic> _nodeToJson(FileSystemNode node) {  
+    if (node.isDirectory) {  
+      final dirNode = node as DirectoryNode;  
+      return {  
+        'name': dirNode.name,  
+        'path': dirNode.path,  
+        'isDirectory': true,  
+        'createDateTime': dirNode.createDateTime.toIso8601String(),  
+        'children': dirNode.children.map(_nodeToJson).toList(),  
+      };  
+    } else {  
+      final fileNode = node as FileNode;  
+      return {  
+        'name': fileNode.name,  
+        'path': fileNode.path,  
+        'isDirectory': false,  
+        'createDateTime': fileNode.createDateTime.toIso8601String(),  
+        'fileConfig': fileNode.fileConfig.toMap(),  
+      };  
+    }  
+  }  
+  
+  /// 从JSON恢复文件树  
+  factory FileTreeManager.fromJson(Map<String, dynamic> json) {  
+    final rootPath = json['path'] as String;  
+    final manager = FileTreeManager(rootPath: rootPath);  
+  
+    final rootNode = manager.root;  
+    _parseChildren(json['children'] as List<dynamic>, rootNode);  
+  
+    return manager;  
+  }  
+  
+  static void _parseChildren(List<dynamic> childrenJson, DirectoryNode parent) {  
+    for (var childJson in childrenJson) {  
+      if (childJson['isDirectory'] as bool) {  
+        final dirNode = DirectoryNode(  
+          name: childJson['name'] as String,  
+          path: childJson['path'] as String,  
+          createDateTime: DateTime.parse(childJson['createDateTime'] as String),  
+        );  
+  
+        parent.addChild(dirNode);  
+        _parseChildren(childJson['children'] as List<dynamic>, dirNode);  
+      } else {  
+        final fileConfig = DrawingBoardFileConfig.fromMap(  
+            childJson['fileConfig'] as Map<String, dynamic>  
+        );  
+  
+        final fileNode = FileNode(fileConfig);  
+        parent.addChild(fileNode);  
+      }  
+    }  
+  }  
+  
+  /// 将文件树json写入配置文件  
+  void writeToConfigFile() async {  
+    String? workplacePath = await Settings.getValue(SettingsConfig.workspacePath,defaultValue: "");  
+    if (workplacePath != null && workplacePath.isNotEmpty) {  
+      FileUtil.writeFile("$workplacePath/DrawingBoardFileList.json", jsonEncode(toJson()));  
+    }  
+  }  
+  
+  /// 从文件读取json  
+  static Future<FileTreeManager> readFromConfigFile()  async {  
+    String? workplacePath = await Settings.getValue(SettingsConfig.workspacePath,defaultValue: "");  
+    if (workplacePath != null && workplacePath.isNotEmpty) {  
+      if(await FileUtil.fileExists("$workplacePath/DrawingBoardFileList.json")){  
+        String jsonString = await FileUtil.readFile("$workplacePath/DrawingBoardFileList.json");  
+        Map<String, dynamic> json = jsonDecode(jsonString);  
+        return FileTreeManager.fromJson(json);  
+      }else{  
+        FileUtil.writeFile("$workplacePath/DrawingBoardFileList.json", jsonEncode(FileTreeManager(rootPath: '').toJson()));  
+        return FileTreeManager(rootPath: '');  
+      }  
+    }else{  
+      return FileTreeManager(rootPath: '');  
+    }  
+  }  
+}
+```
+## 前端UI构建
+### 对`BreadcrumbBar`的介绍
+>这是源于格林童话,后母把孩子带入森林，想让他困死在森林中，但是孩子一路把面包掰成碎屑，洒在路上，最后引导自己走出深林。
+>导航（特指显示访问路径的导航，即”首页->频道页->列表页->内文页“这种）,也能起到将用户带出网站森林的作用，所以叫面包屑导航。
+
+让我们看看都有哪些属性可以使用：
+```dart
+const BreadcrumbBar({  
+  super.key,  
+  required this.items,  
+  // 自定义溢出按钮的样式（当空间不足时显示）。
+  this.overflowButtonBuilder = _defaultOverflowButtonBuilder,  
+  // 统一处理所有面包屑项的点击事件，回调参数为被点击项的索引。
+  this.onItemPressed,  
+  // 自定义分隔符图标（默认是一个右箭头 `>`）。
+  this.chevronIconBuilder = _defaultChevronBuilder,  
+  // 设置分隔符图标的大小，默认 `8.0`。
+  this.chevronIconSize = 8.0,  
+});
+```
+#### 最佳实践
+下面的例子中实现了一个面包屑导航条，通过属性`String value`可以定位每一个子项，并且可以通过`value`实现页面跳转和刷新。
+```dart
+/// 文件路径变量，有一个初始的“所有笔记”
+List<BreadcrumbItem<String>> _filePath = <BreadcrumbItem<String>>[  
+  BreadcrumbItem(  
+    label: const Text("所有笔记", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),  
+    value: "",  
+  ),  
+];
+
+/// 下面代码在build函数中展示，创建了一个面包屑导航条，并加载_filePath中各项
+/// 当点击其子项的时候更新当前指向的文件节点路径nowNodePath，
+/// 并通过方法_loadFiles(nowNodePath)更新页面
+BreadcrumbBar<String>(  
+  items: _filePath,  
+  onItemPressed: (item) {  
+    setState(() {  
+      final index = _filePath.indexOf(item);  
+      _filePath.removeRange(index + 1, _filePath.length);  
+      nowNodePath = item.value;  
+    });  
+      _loadFiles(nowNodePath);  
+  },  
+),
+```
+### 开始
+为了易于管理，我们将`/page/home/home_page.dart`中的各个页面的代码抽离出来，使用方法链接。
+```dart
+// 定义导航项列表  
+final List<NavigationPaneItem> _items = [  
+  PaneItemHeader(header: const Text('笔记')),  
+  PaneItem(  
+    icon: const Icon(FluentIcons.home),  
+    title: const Text('所有笔记'),  
+    body: AllFilesPage(),  
+  ),  
+  PaneItemHeader(header: const Text('应用')),  
+  PaneItem(  
+    icon: const Icon(FluentIcons.settings),  
+    title: const Text('设置'),  
+    body: Container(),  
+  ),  
+  PaneItem(  
+    icon: const Icon(FluentIcons.help),  
+    title: const Text('关于'),  
+    body: Container(),  
+  ),  
+];
+```
+我们创建`/page/home/all_files_page.dart`：
+```dart
+import 'package:fluent_ui/fluent_ui.dart';  
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';  
+import 'package:inksrcibe/class/drawing_board_file.dart';  
+import 'package:inksrcibe/config/settings_config.dart';  
+import 'package:inksrcibe/main.dart';  
+import 'package:inksrcibe/util/file_util.dart';  
+import 'package:inksrcibe/util/info_bar_util.dart';  
+import 'package:inksrcibe/util/route/route_util.dart';  
+import 'package:inksrcibe/util/route/routes.dart';  
+  
+/**  
+ *@Author: ZhanshuoBai *@CreateTime: 2025-05-15 *@Description: *@Version: 1.0 */  
+class AllFilesPage extends StatefulWidget {  
+  const AllFilesPage({super.key});  
+  
+  @override  
+  State<AllFilesPage> createState() => _AllFilesPageState();  
+}  
+  
+class _AllFilesPageState extends State<AllFilesPage> {  
+  /// 笔记列表  
+  List<FileSystemNode> _fileSystemNode = [];  
+  /// 是否加载中  
+  bool _isLoading = true;  
+  /// 错误信息  
+  String? _error;  
+  /// 文件路径  
+  List<BreadcrumbItem<String>> _filePath = <BreadcrumbItem<String>>[  
+    BreadcrumbItem(  
+      label: const Text("所有笔记", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),  
+      value: "",  
+    ),  
+  ];  
+  /// 当前页面  
+  String nowNodePath = "";  
+  
+  /// 创建封面  
+  Widget buildBookCover(FileSystemNode fileSystemNode) {  
+    if(fileSystemNode.isDirectory){  
+      DirectoryNode fileNode = fileSystemNode as DirectoryNode;  
+      return  IconButton(  
+          style: ButtonStyle(padding: ButtonState.all(EdgeInsets.zero),),  
+          icon: Container(  
+            decoration: BoxDecoration(  
+              // color: FluentTheme.of(context).cardColor,  
+              borderRadius: BorderRadius.circular(8),  
+            ),  
+            child: Column(  
+              crossAxisAlignment: CrossAxisAlignment.start,  
+              children: [  
+                Padding(  
+                  padding: const EdgeInsets.only(right: 5,bottom: 5),  
+                  child: Row(  
+                    mainAxisAlignment: MainAxisAlignment.end,  
+                    children: [  
+                      IconButton(icon: const Icon(FluentIcons.more), onPressed: () {})  
+                    ],  
+                  ),  
+                ),  
+                Expanded(  
+                  child: Padding(  
+                    padding: const EdgeInsets.symmetric(horizontal: 0),  
+                    child: Center(  
+                        child: Stack(  
+                          children: [  
+                            Center(  
+                              child: Image.asset("assets/folder_cover.png",width: double.infinity,),  
+                            ),  
+                            Center(  
+                                child: Container(  
+                                  margin: EdgeInsets.only(top: 10,left: 12,right:12),  
+                                  child: Text(  
+                                    fileNode.name,  
+                                    style: const TextStyle(  
+                                      fontSize: 14,  
+                                      fontWeight: FontWeight.normal,  
+                                      color: Colors.grey,  
+                                    ),  
+                                  ),  
+                                )  
+                            )  
+                          ],  
+                        )  
+                    ),  
+                  ),  
+                ),  
+                Padding(  
+                  padding: const EdgeInsets.all(8.0),  
+                  child: Text(  
+                    "${fileNode.createDateTime.year}-${fileNode.createDateTime.month}-${fileNode.createDateTime.day}",  
+                    style: const TextStyle(  
+                      fontSize: 12,  
+                    ),  
+                  ),  
+                ),  
+              ],  
+            ),  
+          ),  
+          onPressed:(){  
+            setState(() {  
+              _filePath.add(  
+                BreadcrumbItem(  
+                  label: Text(fileNode.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),  
+                  value: fileNode.path,  
+                ),  
+              );  
+              nowNodePath = fileNode.path;  
+            });  
+            _loadFiles(nowNodePath);  
+          });  
+    }else{  
+      FileNode fileNode = fileSystemNode as FileNode;  
+      return IconButton(  
+          style: ButtonStyle(padding: ButtonState.all(EdgeInsets.zero),),  
+          icon: Container(  
+        decoration: BoxDecoration(  
+          // color: FluentTheme.of(context).cardColor,  
+          borderRadius: BorderRadius.circular(8),  
+        ),  
+        child: Column(  
+          crossAxisAlignment: CrossAxisAlignment.start,  
+          children: [  
+            Padding(  
+              padding: const EdgeInsets.only(right: 5,bottom: 5),  
+              child: Row(  
+                mainAxisAlignment: MainAxisAlignment.end,  
+                children: [  
+                  IconButton(icon: const Icon(FluentIcons.more), onPressed: () {})  
+                ],  
+              ),  
+            ),  
+            Expanded(  
+              child: Padding(  
+                padding: const EdgeInsets.symmetric(horizontal: 0),  
+                child: Center(  
+                    child: Stack(  
+                        children:[  
+                          Center(  
+                            child: Image.asset("assets/board_cover.png",width: double.infinity,),  
+                          ),  
+  
+                          Center(  
+                            child:Container(  
+                              margin: EdgeInsets.only(top: 0,left: 15,right: 15),  
+                              child:Text(  
+                                fileNode.fileConfig.name,  
+                                style: const TextStyle(  
+                                  fontSize: 14,  
+                                  fontWeight: FontWeight.normal,  
+                                  color: Colors.white,  
+                                ),  
+                              ),  
+                            ),  
+                          )  
+                        ]  
+                    )  
+                ),  
+              ),  
+            ),  
+            Padding(  
+              padding: const EdgeInsets.all(8.0),  
+              child:Column(  
+                children: [  
+                  Text(  
+                    "${fileNode.fileConfig.createDateTime.year}-${fileNode.fileConfig.createDateTime.month}-${fileNode.fileConfig.createDateTime.day}",  
+                    style: const TextStyle(  
+                      fontSize: 12,  
+                    ),  
+                  ),  
+                ],  
+              )  
+            ),  
+          ],  
+        ),  
+      ),  
+          onPressed: (){  
+            RouteUtils.pushForNamed(context, RoutePath.handwriting_blank_page,arguments: {"path":fileNode.fileConfig.path,"function":"load"});  
+          }  
+      );  
+    }  
+  
+  }  
+  
+  /// 新建文件夹  
+  void _createFolder(BuildContext context) async {  
+    bool _isSameFolderName(String name){  
+      for(FileSystemNode item in fileTreeManager.root.children) {  
+        if(item.isDirectory&&item.name==name){  
+          return true;  
+        }  
+      }  
+      return false;  
+    }  
+    TextEditingController controller = TextEditingController();  
+    // 输入文件夹名称  
+    final result = await showDialog<String>(  
+      context: context,  
+      builder: (context) => ContentDialog(  
+        title: const Text('请输入文件夹名称'),  
+        content:Container(  
+          height: 50,  
+          child: TextBox(  
+            controller: controller,  
+            placeholder: '文件夹名称',  
+            maxLines: 1,  
+            maxLength: 32,  
+          ),  
+        ),  
+        actions: [  
+          Button(  
+            child: const Text('取消'),  
+            onPressed: () {  
+              Navigator.pop(context, '');  
+            },  
+          ),  
+          FilledButton(  
+            child: const Text('确认'),  
+            onPressed: () async {  
+              if(controller.text.trim()==""){  
+                InfoBarUtil.showErrorInfoBar(context: context, title: "文件夹命名不能为空", message: "请输入文件夹名称");  
+              }else if(controller.text.trim().length>32){  
+                InfoBarUtil.showErrorInfoBar(context: context, title: "文件夹名称过长", message: "请重新输入");  
+              }else if(_isSameFolderName(controller.text.trim())){  
+                InfoBarUtil.showErrorInfoBar(context: context, title: "当前目录下已有同名文件夹", message: "请重新输入");  
+              }else{  
+                Navigator.pop(context, controller.text.trim());  
+              }  
+            }  
+          ),  
+        ],  
+      ),  
+    );  
+    // 创建文件夹  
+    if(result!=null&&result!=""){  
+      FileUtil.createFolder(result);  
+      String workspacePath =Settings.getValue(SettingsConfig.workspacePath,defaultValue: "")??"";  
+      FileUtil.createFolder("$workspacePath/${nowNodePath==''?'':(nowNodePath+'/')}$result");  
+      fileTreeManager.createDirectory(result,parentPath: nowNodePath);  
+      fileTreeManager.writeToConfigFile();  
+      InfoBarUtil.showSuccessInfoBar(context: context, title: "创建成功", message: "");  
+      _loadFiles(nowNodePath);  
+    }  
+  }  
+  
+  
+  @override  
+  void initState() {  
+    super.initState();  
+    _loadFiles(nowNodePath);  
+  }  
+  
+  /// 加载首页笔记/封面  
+  Future<void> _loadFiles(String path) async {  
+    _fileSystemNode = [];  
+    try {  
+      for(FileSystemNode item in fileTreeManager.getDirectoryContent(path)){  
+        _fileSystemNode.add(item);  
+      }  
+      setState(() {  
+        _fileSystemNode;  
+        _isLoading = false;  
+        _error = null;  
+      });  
+    } catch (e) {  
+      setState(() {  
+        _isLoading = false;  
+        _error = '加载失败: $e';  
+        print(e);  
+      });  
+    }  
+  }  
+  
+  @override  
+  Widget build(BuildContext context) {  
+    return Container(  
+      child: SafeArea(  
+        child: SingleChildScrollView(  
+          child: Container(  
+            margin: const EdgeInsets.symmetric(horizontal: 20),  
+            child: Column(  
+              children: [  
+                const SizedBox(height: 10),  
+                BreadcrumbBar<String>(  
+                  items: _filePath,  
+                  onItemPressed: (item) {  
+                    setState(() {  
+                      final index = _filePath.indexOf(item);  
+                      _filePath.removeRange(index + 1, _filePath.length);  
+                      nowNodePath = item.value;  
+                    });  
+                      _loadFiles(nowNodePath);  
+                  },  
+                ),  
+                const SizedBox(height: 20),  
+                Row(  
+                  children: [  
+                    FilledButton(  
+                      child: Row(  
+                        children: const [  
+                          Icon(FluentIcons.circle_addition),  
+                          SizedBox(width: 5),  
+                          Text("快速笔记"),  
+                        ],  
+                      ),  
+                      onPressed: () {  
+                        RouteUtils.pushForNamed(context, RoutePath.handwriting_blank_page,arguments: {"path":nowNodePath,"function":"create"});  
+                      },  
+                    ),  
+                    const SizedBox(width: 10),  
+                    Button(  
+                      child: Row(  
+                        children: const [  
+                          Icon(FluentIcons.new_folder),  
+                          SizedBox(width: 5),  
+                          Text("创建文件夹"),  
+                        ],  
+                      ),  
+                      onPressed: () {  
+                        _createFolder(context);  
+                      },  
+                    ),  
+                  ],  
+                ),  
+                const SizedBox(height: 20),  
+                // 加载状态处理  
+                if (_isLoading)  
+                  const Center(child: ProgressRing())  
+                else if (_error != null)  
+                  Center(child: Text(_error!, style: TextStyle(color: FluentTheme.of(context).accentColor)))  
+                else if (_fileSystemNode != null && _fileSystemNode!.isNotEmpty)  
+                    GridView.builder(  
+                      shrinkWrap: true,  
+                      physics: const NeverScrollableScrollPhysics(),  
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(  
+                        crossAxisCount: (MediaQuery.of(context).size.width > MediaQuery.of(context).size.height) ? 5 : 3,  
+                        mainAxisSpacing: 10,  
+                        crossAxisSpacing: 10,  
+                        childAspectRatio: 0.8,  
+                      ),  
+                      itemCount: _fileSystemNode.length,  
+                      itemBuilder: (context, index) {  
+                        final fileSystemNode = _fileSystemNode[index];  
+                        return GestureDetector(  
+                          onTap: () {  
+                            // 点击笔记封面的操作  
+                          },  
+                          child: buildBookCover(fileSystemNode),  
+                        );  
+                      },  
+                    )  
+                  else  
+                    Container(  
+                      width: MediaQuery.of(context).size.width-50,  
+                      height: MediaQuery.of(context).size.height-300,  
+                      child: Center(  
+                          child: Container(  
+                            height: (MediaQuery.of(context).size.height-300)/2+30,  
+                            child: Column(  
+                              children: [  
+                                Image.asset("assets/no_file_tip.png",width: (MediaQuery.of(context).size.height-300)/2,height: (MediaQuery.of(context).size.height-300)/2),  
+  
+                                Text("暂无笔记",style: TextStyle(fontSize: 18),)  
+  
+                              ],  
+                            ),  
+                          ),  
+                      ),  
+                    ),  
+                const SizedBox(height: 20),  
+              ],  
+            ),  
+          ),  
+        ),  
+      ),  
+    );  
   }  
 }
 ```

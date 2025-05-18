@@ -38,7 +38,6 @@ class _HomePageState extends State<HomePage> {
         icon: const Icon(FluentIcons.home),
         title: const Text('所有笔记'),
         body: AllFilesPage(),
-        // 暂时为空，实际内容在 build 方法中设置
       ),
       PaneItemHeader(header: const Text('应用')),
       PaneItem(
