@@ -1,0 +1,175 @@
+/**
+ *@Author: ZhanshuoBai
+ *@CreateTime: 2025-05-15
+ *@Description: 文件操作工具类，确保每次读写文件前检查权限
+ *@Version: 1.0
+ */
+
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+class FileUtil {
+  /// 检查并请求存储权限
+  static Future<bool> _checkAndRequestPermission() async {
+    // 仅在Android上需要权限检查
+    if (!Platform.isAndroid) return true;
+
+    // 检查权限状态
+    PermissionStatus status_storage = await Permission.storage.status;
+    PermissionStatus status_manageExternalStorage = await Permission.manageExternalStorage.status;
+
+    if (status_storage.isGranted&&status_manageExternalStorage.isGranted) {
+      return true;
+    }
+
+    // 请求权限
+    Map<Permission, PermissionStatus> result = await [
+      Permission.storage,
+      Permission.manageExternalStorage,
+    ].request();
+
+    return result[Permission.storage] == PermissionStatus.granted;
+  }
+
+  /// 获取应用文档目录
+  static Future<Directory> get _appDocDir async {
+    return await getApplicationDocumentsDirectory();
+  }
+
+  /// 获取文件路径
+  static Future<String> _getFilePath(String fileName) async {
+    final directory = await _appDocDir;
+    return '${directory.path}/$fileName';
+  }
+
+  /// 创建文件夹
+  static Future<void> createFolder(String folderPath, {bool recursive = true}) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法创建文件夹');
+    }
+
+    try {
+      final directory = Directory(folderPath);
+      if (!(await directory.exists())) {
+        await directory.create(recursive: recursive);
+      }
+    } catch (e) {
+      print('创建文件夹错误: $e');
+      rethrow;
+    }
+  }
+
+  /// 删除文件夹
+  static Future<void> deleteFolder(String folderPath, {bool recursive = true}) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法删除文件夹');
+    }
+
+    try {
+      final directory = Directory(folderPath);
+      if (await directory.exists()) {
+        await directory.delete(recursive: recursive);
+      } else {
+        throw FileSystemException('文件夹不存在，无法删除', folderPath);
+      }
+    } catch (e) {
+      print('删除文件夹错误: $e');
+      rethrow;
+    }
+  }
+
+  /// 写入文件
+  static Future<void> writeFile(String filePath, String content, {FileMode mode = FileMode.write}) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法写入文件');
+    }
+
+    try {
+      final file = File(filePath);
+
+      // 先确保父目录存在
+      await file.parent.create(recursive: true);
+
+      // 写入文件
+      await file.writeAsString(content, mode: mode);
+    } catch (e) {
+      print('写入文件错误: $e');
+      rethrow;
+    }
+  }
+
+  /// 读取文件
+  static Future<String> readFile(String filePath) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法读取文件');
+    }
+
+    try {
+      final file = File(filePath);
+      if (await file.exists()) {
+        return await file.readAsString();
+      } else {
+        throw FileSystemException('文件不存在', filePath);
+      }
+    } catch (e) {
+      print('读取文件错误: $e');
+      rethrow;
+    }
+  }
+
+  /// 删除文件
+  static Future<void> deleteFile(String filePath) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法删除文件');
+    }
+
+    try {
+      final file = File(filePath);
+
+      if (await file.exists()) {
+        await file.delete();
+      } else {
+        throw FileSystemException('文件不存在，无法删除', filePath);
+      }
+    } catch (e) {
+      print('删除文件错误: $e');
+      rethrow;
+    }
+  }
+
+  /// 检查文件是否存在
+  static Future<bool> fileExists(String filePath) async {
+    if (!await _checkAndRequestPermission()) {
+      return false;
+    }
+
+    try {
+      final file = File(filePath);
+      return await file.exists();
+    } catch (e) {
+      print('检查文件存在错误: $e');
+      return false;
+    }
+  }
+
+  /// 获取文件大小（字节）
+  static Future<int> getFileSize(String filePath) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法获取文件大小');
+    }
+
+    try {
+      final file = File(filePath);
+
+      if (await file.exists()) {
+        return await file.length();
+      } else {
+        throw FileSystemException('文件不存在', filePath);
+      }
+    } catch (e) {
+      print('获取文件大小错误: $e');
+      rethrow;
+    }
+  }
+}
