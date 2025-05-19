@@ -65,7 +65,6 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.only(top: 0),
           child: NavigationView(
             appBar: NavigationAppBar(
-
               automaticallyImplyLeading: false,
               title: DragToMoveArea(
                 child: Container(
@@ -87,12 +86,13 @@ class _HomePageState extends State<HomePage> {
             ),
 
             pane: NavigationPane(
-
+              key:GlobalKey(),
               selected: _selectedIndex,
               onChanged: (index) {
                 setState(() {
                   _selectedIndex = index;
                 });
+                // print(this.context.size?.width);
               },
               displayMode: PaneDisplayMode.auto,
               footerItems: _items,

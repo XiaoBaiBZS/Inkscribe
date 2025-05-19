@@ -172,4 +172,118 @@ class FileUtil {
       rethrow;
     }
   }
+
+  /// 修改文件名
+  static Future<void> renameFile(String oldFilePath, String newFilePath) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法修改文件名');
+    }
+
+    try {
+      final oldFile = File(oldFilePath);
+
+      if (await oldFile.exists()) {
+        // 先确保新文件的父目录存在
+        await File(newFilePath).parent.create(recursive: true);
+        await oldFile.rename(newFilePath);
+      } else {
+        throw FileSystemException('原文件不存在，无法修改名称', oldFilePath);
+      }
+    } catch (e) {
+      print('修改文件名错误: $e');
+      rethrow;
+    }
+  }
+
+  /// 修改文件夹名称
+  static Future<void> renameFolder(String oldFolderPath, String newFolderPath) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法修改文件夹名称');
+    }
+
+    try {
+      final oldDirectory = Directory(oldFolderPath);
+
+      if (await oldDirectory.exists()) {
+        // 先确保新文件夹的父目录存在
+        await Directory(newFolderPath).parent.create(recursive: true);
+        await oldDirectory.rename(newFolderPath);
+      } else {
+        throw FileSystemException('原文件夹不存在，无法修改名称', oldFolderPath);
+      }
+    } catch (e) {
+      print('修改文件夹名称错误: $e');
+      rethrow;
+    }
+  }
+
+  /// 移动文件（剪切并粘贴到新位置）
+  static Future<void> moveFile(String sourcePath, String destinationPath, {bool overwrite = false}) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法移动文件');
+    }
+
+    try {
+      final sourceFile = File(sourcePath);
+      final destinationFile = File(destinationPath);
+
+      // 检查源文件是否存在
+      if (!await sourceFile.exists()) {
+        throw FileSystemException('源文件不存在', sourcePath);
+      }
+
+      // 检查目标文件是否存在
+      if (await destinationFile.exists()) {
+        if (overwrite) {
+          await destinationFile.delete();
+        } else {
+          throw FileSystemException('目标文件已存在且不允许覆盖', destinationPath);
+        }
+      }
+
+      // 确保目标目录存在
+      await destinationFile.parent.create(recursive: true);
+
+      // 执行移动（通过重命名实现）
+      await sourceFile.rename(destinationPath);
+    } catch (e) {
+      print('移动文件错误: $e');
+      rethrow;
+    }
+  }
+
+  /// 移动文件夹（剪切并粘贴到新位置）
+  static Future<void> moveFolder(String sourcePath, String destinationPath, {bool overwrite = false}) async {
+    if (!await _checkAndRequestPermission()) {
+      throw Exception('缺少存储权限，无法移动文件夹');
+    }
+
+    try {
+      final sourceDir = Directory(sourcePath);
+      final destinationDir = Directory(destinationPath);
+
+      // 检查源文件夹是否存在
+      if (!await sourceDir.exists()) {
+        throw FileSystemException('源文件夹不存在', sourcePath);
+      }
+
+      // 检查目标文件夹是否存在
+      if (await destinationDir.exists()) {
+        if (overwrite) {
+          await destinationDir.delete(recursive: true);
+        } else {
+          throw FileSystemException('目标文件夹已存在且不允许覆盖', destinationPath);
+        }
+      }
+
+      // 确保目标父目录存在
+      await destinationDir.parent.create(recursive: true);
+
+      // 执行移动（通过重命名实现）
+      await sourceDir.rename(destinationPath);
+    } catch (e) {
+      print('移动文件夹错误: $e');
+      rethrow;
+    }
+  }
 }

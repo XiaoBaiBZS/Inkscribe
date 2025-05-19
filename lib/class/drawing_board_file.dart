@@ -133,10 +133,10 @@ abstract class FileSystemNode {
 /// 文件夹节点
 class DirectoryNode implements FileSystemNode {
   @override
-  final String name;
+  late String name;
 
   @override
-  final String path;
+  late String path;
 
   @override
   final bool isDirectory = true;
@@ -177,17 +177,20 @@ class DirectoryNode implements FileSystemNode {
 
   @override
   void rename(String newName) {
-    // TODO: 实现目录重命名逻辑
+    name = newName;
+    final components = path.split('/');
+    final parentPath = components.sublist(0, components.length - 1).join('/');
+    path = "$parentPath/$newName";
   }
 }
 
 /// 文件节点
 class FileNode implements FileSystemNode {
   @override
-  final String name;
+  late  String name;
 
   @override
-  final String path;
+  late  String path;
 
   @override
   final bool isDirectory = false;
@@ -209,7 +212,7 @@ class FileNode implements FileSystemNode {
 
   @override
   void rename(String newName) {
-    // TODO: 实现文件重命名逻辑
+    name = newName;
   }
 
   @override
@@ -271,6 +274,7 @@ class FileTreeManager {
 
       for (var child in currentNode.children) {
         if (child.isDirectory && child.name == component) {
+
           currentNode = child as DirectoryNode;
           found = true;
           break;
@@ -283,6 +287,37 @@ class FileTreeManager {
     }
 
     return currentNode;
+  }
+
+  /// 目录重命名 & 实际文件系统中操作重命名
+  void rename(String path,String newName){
+    if (path == root.path) return ;
+
+    // 实现目录查找逻辑
+    List<String> pathComponents = path.split('/');
+    DirectoryNode currentNode = root;
+
+    for (int i = 1; i < pathComponents.length; i++) {
+      String component = pathComponents[i];
+      bool found = false;
+      for (var child in currentNode.children) {
+        if (child.isDirectory && child.name == component) {
+          String? workspacePath = Settings.getValue(SettingsConfig.workspacePath,defaultValue:  "");
+          final components = child.path.split('/');
+          final parentPath = components.sublist(0, components.length - 1).join('/');
+          path = "$parentPath/$newName";
+          FileUtil.renameFolder("$workspacePath${child.path}","$workspacePath$parentPath/$newName");
+          child.rename(newName);
+          writeToConfigFile();
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        throw ArgumentError("目录不存在: $path");
+      }
+    }
+
   }
 
   /// 删除文件或目录
