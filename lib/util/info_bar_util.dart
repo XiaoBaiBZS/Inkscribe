@@ -21,7 +21,7 @@ class InfoBarUtil {
       );
     });
   }
-  static Future<void> showWarningInfoBar({required BuildContext context, required String title,required String message,Icon icon = const Icon(FluentIcons.clear)}) async {
+  static Future<void> showWarningInfoBar({required BuildContext context, required String title,required String message,Icon icon = const Icon(FluentIcons.clear),}) async {
     await displayInfoBar(context, builder: (context, close,) {
       return InfoBar(
         title:  Text(title),
@@ -31,6 +31,8 @@ class InfoBarUtil {
           onPressed: close,
         ),
         severity: InfoBarSeverity.warning,
+
+
       );
     });
   }

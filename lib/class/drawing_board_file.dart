@@ -260,6 +260,35 @@ class FileTreeManager {
     return newDirectory;
   }
 
+  /// 判断目录下是否有重名
+  bool isSameFolder(String path, String targetName){
+    DirectoryNode currentNode = _findDirectory(path);
+    for(var child in currentNode.children){
+      if(child.isDirectory&&child.name==targetName){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// 判断文件所属目录下是否有重名
+  bool isSameFile(String path, String targetName){
+    print(path);
+    final components = path.split('/');
+    final name = components.last;
+    final parentPath = components.sublist(0, components.length - 1).join('/');
+
+    final parent = _findDirectory(parentPath);
+
+    for(var element in parent.children){
+      if(!element.isDirectory&&element.name==targetName){
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /// 查找目录
   DirectoryNode _findDirectory(String path) {
     if (path == root.path) return root;
@@ -290,7 +319,7 @@ class FileTreeManager {
   }
 
   /// 目录重命名 & 实际文件系统中操作重命名
-  void rename(String path,String newName){
+  void renameFolder(String path,String newName){
     if (path == root.path) return ;
 
     // 实现目录查找逻辑
@@ -317,6 +346,26 @@ class FileTreeManager {
         throw ArgumentError("目录不存在: $path");
       }
     }
+
+  }
+
+  /// 文件重命名 & 实际文件系统中操作重命名
+  void renameFile(String path,String newName){
+    final components = path.split('/');
+    final name = components.last;
+    final parentPath = components.sublist(0, components.length - 1).join('/');
+
+    final parent = _findDirectory(parentPath);
+
+    parent.children.forEach((element) {
+      if(!element.isDirectory&&element.path=="${parentPath}/$name"){
+        element as FileNode;
+        element.rename(newName);
+        element.fileConfig.name=newName;
+        writeToConfigFile();
+      }
+    });
+
 
   }
 

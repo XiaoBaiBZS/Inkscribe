@@ -2102,7 +2102,7 @@ class _HomePageState extends State<HomePage> {
   }  
 }
 ```
->由于代码数量增加，从本节起，将不会再提供完整代码，如需查看完整代码，可移步https://github.com/XiaoBaiBZS/Inkscribe/来获取
+>由于代码数量增加，从本节起，将不会再提供完整代码，如需查看完整代码，可移步https://github.com/XiaoBaiBZS/Inkscribe/ 来获取
 # 7. 画布保存与导入
 ## 保存画板文件
 然后我们为了方便管理文件与文件夹，我们可以使用一个配置文件来进行存储，并通过序列化保存文件树，下面来详细介绍。画布控制器中有一个方法`List<Map<String, dynamic>> getJsonList()`，通过这个方法我们可以获取当前画布的绘制json序列，我们可以对这个json处理和保存，以及后续导入这个json加载画布。
@@ -3155,5 +3155,65 @@ class _AllFilesPageState extends State<AllFilesPage> {
   }  
 }
 ```
+# 9. PDF视图
+## 小记
+诚然，使用 pub.dev 以关键字 pdf 搜索能有很多结果，但是仔细阅读各个插件的文档，发现很难有一个插件同时满足：“无商用授权限制”、”跨端，尤其是 Windows 平台“、” Android 平台无需 nkd “、”支持当前 flutter 版本“等，当然提到 pdf 难免会想到 Webview ，于是我又以关键字 Webview 搜索，得到的结果同样不尽如人意。最终选择了插件`pdfrx`，并且成功在 Android 平台和 Windows 平台测试成功，可以正常加载本地pdf文件了。
+## 引入依赖和动态链接库
+### 引入依赖
+```yaml
+pdfrx: ^1.0.1
+```
+### 引入动态链接库
+先让我们看看 pub.dev 怎么说：
+![[Pasted image 20250519074131.png]]
+#### DLL
+DLL文件（Dynamic Link Library，动态链接库）是 Windows 操作系统中的一种共享库文件，包含了程序所需的代码和数据。与静态链接库不同，动态链接库可以在程序运行时动态加载，从而减少程序的内存占用，提高系统的运行效率。为了使得我们能够在 Windows 平台上正常使用此插件，这里我们需要使用到`pdfium.dll`，您可以在互联网上搜索下载，或访问我的 Github 获取。
+#### DLL文件放在哪里？
+1. 手动添加 DLL 文件
+   DLL文件应放置在 build 文件夹下 Windows 平台文件夹中。具体位置可以见下图。
+   ![[Pasted image 20250519074449.png]]
+2. 动态添加 DLL 文件
+   不同于手动添加，我们可以使用代码来帮我们在构建应用的时候自动添加 DLL 文件，首先我们需要把 DLL 文件放置在`/windows`文件夹下，和`/windows/CMakeLists.txt`同级，具体可见下图：
+   ![[Pasted image 20250519074748.png]]
+   然后我们修改`CMakeLists.txt`，在文件最后添加代码：
+```c
+set(ffigen_app_bundled_libraries  
+        "${CMAKE_CURRENT_SOURCE_DIR}/pdfium.dll"  
+        PARENT_SCOPE  
+        )
+```
+这样，在构建 Windows 平台应用时，会自动地把`pdfium.dll`引入到对应目录。
+## 测试插件是否正常工作
+您可以临时创建一个简单 stf 页面，然后使用组件`PdfViewer`来进行测试。
+```dart
+PdfViewer.file("C:/Users/12985/Downloads/你好.pdf"),
+```
+下面是一个简单 stf 页面的完整代码：
+```dart
+
+import 'package:flutter/material.dart';  
+import 'package:pdfrx/pdfrx.dart';  
+  
+  
+class MyBrowser extends StatefulWidget {  
+  const MyBrowser({super.key, this.title});  
+  final String? title;  
+  
+  @override  
+  MyBrowserState createState() => MyBrowserState();  
+}  
+  
+class MyBrowserState extends State<MyBrowser> {  
+  @override  
+  Widget build(BuildContext context) {  
+    return Scaffold(  
+    // 请更换成自己的本地PDF路径
+      // body:PdfViewer.file("/storage/emulated/0/Download/WeiXin/你好.pdf"),  
+      body:PdfViewer.file("C:/Users/12985/Downloads/你好.pdf"),  
+    );  
+  }  
+}
+```
+使用任意的方式路径导航到这个测试页面，如果能够展示pdf文档页面即代表测试成功。![[Pasted image 20250519082449.png]]
 # 打包与发布
 # 应用合规

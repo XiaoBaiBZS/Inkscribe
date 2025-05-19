@@ -71,7 +71,6 @@ class _AllFilesPageState extends State<AllFilesPage> {
     /// 构建文件夹封面
     Widget buildFolderCover(DirectoryNode fileNode){
 
-
       /// 顶部更多按钮
       Widget _buildTopMoreButton() {
 
@@ -79,8 +78,59 @@ class _AllFilesPageState extends State<AllFilesPage> {
         FlyoutController folderCoverController = FlyoutController();
 
         /// 重命名文件夹
-        void _renameFile(DirectoryNode fileNode) async {
-          fileTreeManager.rename(fileNode.path, "newName");
+        void renameFold(DirectoryNode fileNode) async {
+          TextEditingController controller = TextEditingController();
+          void showContentDialog(BuildContext context) async {
+            final result = await showDialog<String>(
+              context: context,
+              builder: (context) => ContentDialog(
+                title: const Text('重命名文件夹'),
+                content: Container(
+                  height: 50,
+                  child: TextBox(
+                    controller: controller,
+                    placeholder: '文件夹名称',
+                    maxLines: 1,
+                    maxLength: 32,
+                  ),
+                ),
+                actions: [
+                  Button(
+                    child: const Text('取消'),
+                    onPressed: () {
+                      Navigator.pop(context, '');
+                    },
+                  ),
+                  FilledButton(
+                      child: const Text('确认'),
+                      onPressed: () async {
+                        if (controller.text.trim() == "") {
+                          InfoBarUtil.showErrorInfoBar(
+                              context: context,
+                              title: "文件夹命名不能为空",
+                              message: "请输入文件夹名称");
+                        } else if (controller.text.trim().length > 32) {
+                          InfoBarUtil.showErrorInfoBar(
+                              context: context, title: "文件夹名称过长", message: "请重新输入");
+                        } else if (fileTreeManager.isSameFolder(nowNodePath,controller.text.trim())) {
+                          InfoBarUtil.showErrorInfoBar(
+                              context: context,
+                              title: "当前目录下已有同名文件夹",
+                              message: "请重新输入");
+                        } else {
+                          Navigator.pop(context, controller.text.trim());
+                        }
+                      }),
+                ],
+              ),
+            );
+            if (result != null && result != "") {
+              fileTreeManager.renameFolder(fileNode.path, result);
+              InfoBarUtil.showSuccessInfoBar(context: context, title: "修改成功", message: '');
+            }
+            setState(() {});
+          }
+          showContentDialog(context);
         }
 
         /// build
@@ -123,7 +173,8 @@ class _AllFilesPageState extends State<AllFilesPage> {
                                         leading: Icon(FluentIcons.rename),
                                         title: Text('重命名'),
                                         onPressed: () {
-                                          _renameFile(fileNode);
+                                          Flyout.of(context).close();
+                                          renameFold(fileNode);
                                         },
                                       ),
 
@@ -249,8 +300,69 @@ class _AllFilesPageState extends State<AllFilesPage> {
         FlyoutController fileCoverController = FlyoutController();
 
         /// 文件重命名
-        void _renameFile(FileNode fileNode) async {
-          fileTreeManager.rename(fileNode.path, "newName");
+        void renameFile(FileNode fileNode) async {
+          TextEditingController controller = TextEditingController();
+          void showContentDialog(BuildContext context) async {
+            final result = await showDialog<String>(
+              context: context,
+              builder: (context) => ContentDialog(
+                title: const Text('重命名画布'),
+                content: Container(
+                  height: 50,
+                  child: TextBox(
+                    controller: controller,
+                    placeholder: '画布名称',
+                    maxLines: 1,
+                    maxLength: 32,
+                  ),
+                ),
+                actions: [
+                  Button(
+                    child: const Text('取消'),
+                    onPressed: () {
+                      Navigator.pop(context, '');
+                    },
+                  ),
+                  FilledButton(
+                      child: const Text('确认'),
+                      onPressed: () async {
+                        if (controller.text.trim() == "") {
+                          InfoBarUtil.showErrorInfoBar(
+                              context: context,
+                              title: "画布命名不能为空",
+                              message: "请输入画布名称");
+                        } else if (controller.text.trim().length > 32) {
+                          InfoBarUtil.showErrorInfoBar(
+                              context: context, title: "画布名称过长", message: "请重新输入");
+                        } else if (fileTreeManager.isSameFile(fileNode.path,controller.text.trim())) {
+                          displayInfoBar(context, builder: (context, close,) {
+                            return InfoBar(
+                              title:  Text("当前目录下已有同名画布"),
+                              content: Text("可能对查找画布造成影响"),
+                              action: Button(
+                                child: const Text('仍然修改'),
+                                onPressed: () {
+                                  Navigator.pop(context, controller.text.trim());
+                                },
+                              ),
+                              severity: InfoBarSeverity.warning,
+                            );
+                          });
+
+                        } else {
+                          Navigator.pop(context, controller.text.trim());
+                        }
+                      }),
+                ],
+              ),
+            );
+            if (result != null && result != "") {
+              fileTreeManager.renameFile(fileNode.path, result);
+              InfoBarUtil.showSuccessInfoBar(context: context, title: "修改成功", message: '');
+            }
+            setState(() {});
+          }
+          showContentDialog(context);
         }
 
         /// build
@@ -293,7 +405,8 @@ class _AllFilesPageState extends State<AllFilesPage> {
                                         leading: Icon(FluentIcons.rename),
                                         title: Text('重命名'),
                                         onPressed: () {
-                                          _renameFile(fileNode);
+                                          Flyout.of(context).close();
+                                          renameFile(fileNode);
                                         },
                                       ),
 
@@ -413,15 +526,6 @@ class _AllFilesPageState extends State<AllFilesPage> {
 
   /// 新建文件夹
   void _createFolder(BuildContext context) async {
-    bool _isSameFolderName(String name) {
-      for (FileSystemNode item in fileTreeManager.root.children) {
-        if (item.isDirectory && item.name == name) {
-          return true;
-        }
-      }
-      return false;
-    }
-
     TextEditingController controller = TextEditingController();
     // 输入文件夹名称
     final result = await showDialog<String>(
@@ -455,7 +559,7 @@ class _AllFilesPageState extends State<AllFilesPage> {
                 } else if (controller.text.trim().length > 32) {
                   InfoBarUtil.showErrorInfoBar(
                       context: context, title: "文件夹名称过长", message: "请重新输入");
-                } else if (_isSameFolderName(controller.text.trim())) {
+                } else if (fileTreeManager.isSameFolder(nowNodePath,controller.text.trim())) {
                   InfoBarUtil.showErrorInfoBar(
                       context: context,
                       title: "当前目录下已有同名文件夹",
@@ -602,7 +706,7 @@ class _AllFilesPageState extends State<AllFilesPage> {
         );
       }
 
-
+      /// build
       return Expanded(
         child: SingleChildScrollView(
           child: Container(
