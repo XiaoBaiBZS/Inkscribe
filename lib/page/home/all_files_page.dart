@@ -68,6 +68,62 @@ class _AllFilesPageState extends State<AllFilesPage> {
   /// 创建封面
   Widget buildBookCover(FileSystemNode fileSystemNode) {
 
+    /// 删除文件/文件夹
+    void delete(FileSystemNode node){
+      void showContentDialog(BuildContext context) async {
+        final result = await showDialog<String>(
+          context: context,
+          builder: (context) => ContentDialog(
+            title: const Text('删除文件或文件夹？'),
+            content: const Text("文件夹内的文件也将永久删除，此操作不可以恢复。"),
+            actions: [
+              Button(
+                child: const Text('取消'),
+                onPressed: () {
+                  Navigator.pop(context, '');
+                },
+              ),
+              FilledButton(
+                  child: const Text('确认'),
+                  onPressed: () async {
+                    displayInfoBar(context, builder: (context, close,) {
+                      return InfoBar(
+                        title:  Text("再次确认"),
+                        content: Text("删除后无法通过任何方式恢复"),
+                        action: Button(
+                          child: const Text('仍然删除'),
+                          onPressed: () {
+                            Navigator.pop(context, '');
+                            close();
+                            fileTreeManager.deleteNode(node.path);
+                            fileTreeManager.writeToConfigFile();
+                            String? workspacePath = Settings.getValue(SettingsConfig.workspacePath,defaultValue: "");
+                            switch(node.isDirectory){
+                              case true:
+                                FileUtil.deleteFolder("$workspacePath${node.path}");
+                                break;
+                              case false:
+                                FileUtil.deleteFile("$workspacePath${node.path}");
+                            }
+                            _loadFiles(nowNodePath);
+                          },
+                        ),
+                        severity: InfoBarSeverity.warning,
+                      );
+                    });
+
+
+
+                  }),
+            ],
+          ),
+        );
+      }
+      showContentDialog(context);
+
+
+    }
+
     /// 构建文件夹封面
     Widget buildFolderCover(DirectoryNode fileNode){
 
@@ -182,7 +238,8 @@ class _AllFilesPageState extends State<AllFilesPage> {
                                         leading: Icon(FluentIcons.delete,),
                                         title: Text('删除'),
                                         onPressed: () {
-
+                                          Flyout.of(context).close();
+                                          delete(fileNode);
                                         },
                                       ),
                                     ],
@@ -414,7 +471,8 @@ class _AllFilesPageState extends State<AllFilesPage> {
                                         leading: Icon(FluentIcons.delete,),
                                         title: Text('删除'),
                                         onPressed: () {
-
+                                          Flyout.of(context).close();
+                                          delete(fileNode);
                                         },
                                       ),
                                     ],

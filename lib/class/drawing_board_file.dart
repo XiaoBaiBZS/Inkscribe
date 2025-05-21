@@ -378,7 +378,7 @@ class FileTreeManager {
     final parent = _findDirectory(parentPath);
 
     for (var child in parent.children) {
-      if (child.name == name) {
+      if (child.path == path) {
         parent.removeChild(child);
         child.delete();
         break;
