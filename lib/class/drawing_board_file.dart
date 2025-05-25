@@ -391,6 +391,20 @@ class FileTreeManager {
     return _findDirectory(path).children;
   }
 
+  /// 复制文件
+
+
+
+  /// 复制目录
+  void copyFolderNode(String sourcePath, {String? targetPath}) {
+    DirectoryNode sourceNode = _findDirectory(sourcePath);
+    final parent = _findDirectory(targetPath ?? root.path);
+    final newPath = '${parent.path}/${sourceNode.name}';
+    sourceNode.path = newPath;
+    final newDirectory = sourceNode;
+    parent.addChild(newDirectory);
+  }
+
   /// 将文件树转换为JSON
   Map<String, dynamic> toJson() {
     return _nodeToJson(root);

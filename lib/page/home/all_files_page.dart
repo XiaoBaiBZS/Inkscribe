@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:inksrcibe/class/drawing_board_file.dart';
 import 'package:inksrcibe/config/settings_config.dart';
@@ -65,8 +68,96 @@ class _AllFilesPageState extends State<AllFilesPage> {
   /// 当前页面
   String nowNodePath = "";
 
+  /// 列表树
+  List<TreeViewItem> _fileTreeItems = [
+    TreeViewItem(
+      content: const Text('Personal Documents'),
+      value: 'personal_docs',
+      children: [
+        TreeViewItem(
+          content: const Text('Home Remodel'),
+          value: 'home_remodel',
+          children: [
+            TreeViewItem(
+              content: const Text('Contractor Contact Info'),
+              value: 'contr_cont_inf',
+            ),
+            TreeViewItem(
+              content: const Text('Paint Color Scheme'),
+              value: 'paint_color_scheme',
+            ),
+            TreeViewItem(
+              content: const Text('Flooring weedgrain type'),
+              value: 'flooring_weedgrain_type',
+            ),
+            TreeViewItem(
+              content: const Text('Kitchen cabinet style'),
+              value: 'kitch_cabinet_style',
+            ),
+          ],
+        ),
+        TreeViewItem(
+          content: const Text('Tax Documents'),
+          value: 'tax_docs',
+          children: [
+            TreeViewItem(content: const Text('2017'), value: "tax_2017"),
+            TreeViewItem(
+              content: const Text('Middle Years'),
+              value: 'tax_middle_years',
+              children: [
+                TreeViewItem(content: const Text('2018'), value: "tax_2018"),
+                TreeViewItem(content: const Text('2019'), value: "tax_2019"),
+                TreeViewItem(content: const Text('2020'), value: "tax_2020"),
+              ],
+            ),
+            TreeViewItem(content: const Text('2021'), value: "tax_2021"),
+            TreeViewItem(content: const Text('Current Year'), value: "tax_cur"),
+          ],
+        ),
+      ],
+    ),
+  ];
+
+
   /// 创建封面
   Widget buildBookCover(FileSystemNode fileSystemNode) {
+
+    /// 移动文件/文件夹
+    void move(FileSystemNode node){
+      void showContentDialog(BuildContext context) async {
+        final result = await showDialog<String>(
+          context: context,
+          builder: (context) => ContentDialog(
+            title: const Text('移动目标位置'),
+            content: TreeView(
+              selectionMode: TreeViewSelectionMode.single,
+              shrinkWrap: true,
+              items: _fileTreeItems,
+              // onItemInvoked: (item) async {},
+              onSelectionChanged: (selectedItems) async => debugPrint(
+                  'onSelectionChanged: \${selectedItems.map((i) => i.value)}'),
+              onSecondaryTap: (item, details) async {
+                debugPrint('onSecondaryTap $item at ${details.globalPosition}');
+              },
+            ),
+            actions: [
+              Button(
+                child: const Text('取消'),
+                onPressed: () {
+                  Navigator.pop(context, '');
+                },
+              ),
+              FilledButton(
+                  child: const Text('确认'),
+                  onPressed: () async {
+
+                  }),
+            ],
+          ),
+        );
+      }
+      showContentDialog(context);
+    }
 
     /// 删除文件/文件夹
     void delete(FileSystemNode node){
@@ -221,7 +312,8 @@ class _AllFilesPageState extends State<AllFilesPage> {
                                         leading: Icon(FluentIcons.move),
                                         title: Text('移动'),
                                         onPressed: () {
-
+                                          Flyout.of(context).close();
+                                          move(fileNode);
                                         },
                                       ),
 
@@ -454,7 +546,8 @@ class _AllFilesPageState extends State<AllFilesPage> {
                                         leading: Icon(FluentIcons.move),
                                         title: Text('移动'),
                                         onPressed: () {
-
+                                          Flyout.of(context).close();
+                                          move(fileNode);
                                         },
                                       ),
 
@@ -665,11 +758,50 @@ class _AllFilesPageState extends State<AllFilesPage> {
     }
   }
 
+  /// 加载文件树
+  void _loadFileTree() {
+    _fileTreeItems = [];
+
+    // 解析 JSON 数据
+    Map<String, dynamic> data = fileTreeManager.toJson();
+
+    // 递归函数来处理每个节点，只包含目录
+    TreeViewItem processNode(Map<String, dynamic> node) {
+      String name = node['name']==''?'所有笔记':node['name'];
+      String path = node['path'];
+      bool isDirectory = node['isDirectory'];
+      List<dynamic> children = node['children'] ?? [];
+
+      // 过滤掉非目录的子项
+      List<TreeViewItem> filteredChildren = [];
+      for (var child in children) {
+        if (child['isDirectory'] == true) {
+          filteredChildren.add(processNode(child));
+        }
+      }
+
+      // 创建 TreeViewItem，只包含目录子项
+      TreeViewItem treeItem = TreeViewItem(
+        content: Text(name,style: const TextStyle(fontSize: 16),),
+        value: path,
+        children: filteredChildren,
+      );
+
+      return treeItem;
+    }
+
+
+    _fileTreeItems =  [processNode(data)];
+  }
+
+
   @override
   void initState() {
     super.initState();
     /// 加载主页的封面
     _loadFiles(nowNodePath);
+    /// 加载文件树
+    _loadFileTree();
   }
 
   @override
