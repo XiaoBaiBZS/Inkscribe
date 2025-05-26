@@ -24,16 +24,24 @@ class BaseToolButton extends StatefulWidget {
   final double controllerBarWidth;
   late final Widget icon;
   bool isSelected = false;
+
   late final String toolName;
   WidgetLocation toolLocation = WidgetLocation.center;
 
 
   @override
-  State<BaseToolButton> createState() => _BaseToolButtonState();
+  State<BaseToolButton> createState() => BaseToolButtonState();
 }
 
-class _BaseToolButtonState extends State<BaseToolButton> {
-
+class BaseToolButtonState extends State<BaseToolButton> {
+  bool canOnTap = true;
+  void setCanOnTap(bool canOnTap){
+    print(canOnTap);
+    setState(() {
+      canOnTap = canOnTap;
+    });
+    print(canOnTap);
+  }
 
 
   @override
@@ -45,16 +53,16 @@ class _BaseToolButtonState extends State<BaseToolButton> {
         width: widget.controllerBarWidth,
         child: IconButton(
           icon: widget.icon,
-          onPressed: () {
-            setState(() {
-              if (!widget.isSelected) {
-                widget.toolSelectOnce();
-                widget.isSelected = true;
-              }else{
-                widget.toolSelectTwice();
-              }
-            });
-          },
+          onPressed: canOnTap? () {
+              setState(() {
+                if (!widget.isSelected) {
+                  widget.toolSelectOnce();
+                  widget.isSelected = true;
+                }else{
+                  widget.toolSelectTwice();
+                }
+              });
+          } : null,
           style: ButtonStyle(
             backgroundColor: ButtonState.all(
               widget.isSelected
