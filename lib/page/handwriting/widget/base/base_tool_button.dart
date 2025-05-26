@@ -8,16 +8,25 @@ import 'package:fluent_ui/fluent_ui.dart';
  *@Version: 1.0
  */
 
+enum WidgetLocation{
+  left,
+  right,
+  center,
+}
+
 class BaseToolButton extends StatefulWidget {
-  BaseToolButton({super.key});
+  BaseToolButton({super.key, required this.context,required this.controllerBarHeight, required this.controllerBarWidth,});
+  BuildContext context;
   final FlyoutController flyoutController = FlyoutController();
   final Function toolSelectOnce = (){};
   final Function toolSelectTwice = (){};
-  double controllerBarHeight = 50;
-  double controllerBarWidth = 50;
-  late final Icon icon;
+  final double controllerBarHeight;
+  final double controllerBarWidth;
+  late final Widget icon;
   bool isSelected = false;
   late final String toolName;
+  WidgetLocation toolLocation = WidgetLocation.center;
+
 
   @override
   State<BaseToolButton> createState() => _BaseToolButtonState();

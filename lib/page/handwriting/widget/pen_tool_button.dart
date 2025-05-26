@@ -15,9 +15,10 @@ class PenToolButton extends BaseToolButton{
   late double _penWidth;
   late Color _penColor;
 
-  PenToolButton(this._drawingController, this._penWidth, this._penColor, {super.key}){
+  PenToolButton(this._drawingController, this._penWidth, this._penColor, {super.key, required super.controllerBarHeight, required super.controllerBarWidth, required super.context,}){
     icon  = const Icon(FluentIcons.pen_workspace);
     toolName = "pen";
+
   }
 
   @override

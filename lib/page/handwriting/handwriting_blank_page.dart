@@ -14,6 +14,7 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:inksrcibe/class/drawing_board_file.dart';
 import 'package:inksrcibe/main.dart';
 import 'package:inksrcibe/page/handwriting/widget/base/base_tool_button.dart';
+import 'package:inksrcibe/page/handwriting/widget/controller_tools_bar.dart';
 import 'package:inksrcibe/page/handwriting/widget/pen_tool_button.dart';
 import 'package:inksrcibe/util/file_util.dart';
 import 'package:inksrcibe/util/info_bar_util.dart';
@@ -753,7 +754,7 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
       buildEraseToolButton(),
       buildUndoToolButton(),
       buildRedoToolButton(),
-      PenToolButton(_drawingController,_penWidth,_penColor),
+      // PenToolButton(_drawingController,_penWidth,_penColor),
     ];
 
 
@@ -1091,6 +1092,7 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
     _drawingController.setPaintContent(SmoothLine(brushPrecision: 0.1));
     // 设置画笔颜色和粗细
     _drawingController.setStyle(color: _penColor, strokeWidth: _penWidth);
+
   }
 
   @override
@@ -1318,7 +1320,8 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
               ],
             ),
             // 底部控制栏
-            _buildControllerBar(),
+            ControllerToolsBar(context: context,drawingController: _drawingController,),
+            // _buildControllerBar(),
           ],
         ),
       ),
