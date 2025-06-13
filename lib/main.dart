@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:inksrcibe/class/drawing_board_file.dart';
+import 'package:inksrcibe/page/handwriting/widget/drawing_state.dart';
 import 'package:inksrcibe/page/welcome/welcome_page.dart';
+import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'util/route/route_util.dart';
@@ -45,7 +47,12 @@ Future<void> main() async {
   //   dark: false,
   // );
   fileTreeManager = await FileTreeManager.readFromConfigFile();
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => DrawingState(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
