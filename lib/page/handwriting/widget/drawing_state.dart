@@ -1,7 +1,7 @@
 /**
  *@Author: ZhanshuoBai
  *@CreateTime: 2025-06-13
- *@Description:
+ *@Description: 重构为工厂模式的DrawingState类
  *@Version: 1.0
  */
 
@@ -19,17 +19,25 @@ import 'package:flutter/material.dart' as material;
 import 'package:inksrcibe/util/file_util.dart';
 
 class DrawingState extends ChangeNotifier {
+  // 私有静态实例映射，用于存储不同标识的实例
+  static final Map<String, DrawingState> _instances = {};
 
+  // 工厂构造函数，根据标识符获取或创建实例
+  factory DrawingState([String identifier = 'default']) {
+    return _instances.putIfAbsent(
+      identifier,
+          () => DrawingState._internal(identifier),
+    );
+  }
 
-  // 私有静态实例
-  static final DrawingState _instance = DrawingState._();
+  // 获取默认实例的便捷方式
+  static DrawingState get instance => DrawingState();
 
-  // 工厂构造函数，提供全局访问点
-  factory DrawingState() => _instance;
+  // 私有构造函数
+  DrawingState._internal(this._identifier);
 
-  // 私有构造函数，防止外部实例化
-  DrawingState._();
-
+  // 实例标识符
+  final String _identifier;
 
   /// 画布控制器
   DrawingController drawingController = DrawingController();
@@ -171,15 +179,15 @@ class DrawingState extends ChangeNotifier {
   /// 创建文件对象
   void createFile(String path) async {
     DateTime now = DateTime.now();
-    drawingBoardData.add( drawingController.getJsonList().toString());
-    drawingBoardFile  = DrawingBoardFile(
+    drawingBoardData.add(drawingController.getJsonList().toString());
+    drawingBoardFile = DrawingBoardFile(
       name: "未命名笔记",
       path: "$path/${now.millisecondsSinceEpoch}.json",
       type: "normal",
       createDateTime: now,
       data: drawingBoardData,
     );
-    fileTreeManager.addFile(DrawingBoardFileConfig.fromDrawingBoardFile(drawingBoardFile),directoryPath: path);
+    fileTreeManager.addFile(DrawingBoardFileConfig.fromDrawingBoardFile(drawingBoardFile), directoryPath: path);
     fileTreeManager.writeToConfigFile();
     drawingBoardData[nowPageIndex] = jsonEncode(drawingController.getJsonList());
     notifyListeners();
@@ -225,108 +233,107 @@ class DrawingState extends ChangeNotifier {
         return Stack(
           children: [
             Positioned(
-                bottom: 50,
-                left: (MediaQuery.of(dialogContext).size.width - 365) / 2,
-                child: Center(
-                  child: ContentDialog(
-                    title: const Text('选择画笔颜色'),
-                    content: Container(
-                      height: 340,
-                      child: Column(
-                        children: [
-                          // 颜色选择器主体
-                          Container(
-                            child: material.Material(
-                              child: Container(
-                                color: FluentTheme.of(dialogContext).menuColor,
-                                child: ColorPicker(
-                                  pickerColor: tempColor,
-                                  onColorChanged: (Color color) {
-                                    tempColor = color; // 更新临时颜色
-                                  },
-                                  portraitOnly: true,
-                                  enableAlpha: false,
-                                  labelTypes: [],
-                                  displayThumbColor: true,
-                                  pickerAreaHeightPercent: 0.5,
-                                  pickerAreaBorderRadius: BorderRadius.circular(8.0),
-                                  paletteType: PaletteType.hsvWithValue,
-                                ),
+              bottom: 50,
+              left: (MediaQuery.of(dialogContext).size.width - 365) / 2,
+              child: Center(
+                child: ContentDialog(
+                  title: const Text('选择画笔颜色'),
+                  content: Container(
+                    height: 340,
+                    child: Column(
+                      children: [
+                        // 颜色选择器主体
+                        Container(
+                          child: material.Material(
+                            child: Container(
+                              color: FluentTheme.of(dialogContext).menuColor,
+                              child: ColorPicker(
+                                pickerColor: tempColor,
+                                onColorChanged: (Color color) {
+                                  tempColor = color; // 更新临时颜色
+                                },
+                                portraitOnly: true,
+                                enableAlpha: false,
+                                labelTypes: [],
+                                displayThumbColor: true,
+                                pickerAreaHeightPercent: 0.5,
+                                pickerAreaBorderRadius: BorderRadius.circular(8.0),
+                                paletteType: PaletteType.hsvWithValue,
                               ),
                             ),
                           ),
-                          Container(
-                            height: 110,
-                            padding: const EdgeInsets.all(4.0),
-                            child: StatefulBuilder(
-                              builder: (BuildContext context, StateSetter setState) {
-                                return GridView.builder(
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 8,
-                                    mainAxisSpacing: 4,
-                                    crossAxisSpacing: 4,
-                                  ),
-                                  itemCount: colorHistory.length,
-                                  itemBuilder: (context, index) {
-                                    final color = colorHistory[index];
-                                    return GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          tempColor = color; // 选择历史颜色
-                                        });
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: color,
-                                          borderRadius: BorderRadius.circular(4),
-                                          border: Border.all(
-                                            color: tempColor == color
-                                                ? FluentTheme.of(context).accentColor
-                                                : Colors.transparent,
-                                            width: 2,
-                                          ),
+                        ),
+                        Container(
+                          height: 110,
+                          padding: const EdgeInsets.all(4.0),
+                          child: StatefulBuilder(
+                            builder: (BuildContext context, StateSetter setState) {
+                              return GridView.builder(
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 8,
+                                  mainAxisSpacing: 4,
+                                  crossAxisSpacing: 4,
+                                ),
+                                itemCount: colorHistory.length,
+                                itemBuilder: (context, index) {
+                                  final color = colorHistory[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        tempColor = color; // 选择历史颜色
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: color,
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: tempColor == color
+                                              ? FluentTheme.of(context).accentColor
+                                              : Colors.transparent,
+                                          width: 2,
                                         ),
                                       ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    actions: [
-                      Button(
-                        child: const Text('取消'),
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-
-                        },
-                      ),
-                      FilledButton(
-                        child: const Text('确定'),
-                        onPressed: () {
-                          // 直接修改静态属性
-                          penColor = tempColor;
-                          selectedColor = tempColor;
-                          drawingController.setStyle(
-                            color: penColor,
-                            strokeWidth: penWidth,
-                          );
-
-                          // 更新颜色历史记录
-                          updateColorHistory(tempColor);
-
-                          // 通知状态更新
-                          notifyListeners();
-
-                          Navigator.of(dialogContext).pop();
-                        },
-                      ),
-                    ],
                   ),
-                )
+                  actions: [
+                    Button(
+                      child: const Text('取消'),
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                      },
+                    ),
+                    FilledButton(
+                      child: const Text('确定'),
+                      onPressed: () {
+                        // 直接修改静态属性
+                        penColor = tempColor;
+                        selectedColor = tempColor;
+                        drawingController.setStyle(
+                          color: penColor,
+                          strokeWidth: penWidth,
+                        );
+
+                        // 更新颜色历史记录
+                        updateColorHistory(tempColor);
+
+                        // 通知状态更新
+                        notifyListeners();
+
+                        Navigator.of(dialogContext).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ),
             )
           ],
         );
@@ -337,7 +344,7 @@ class DrawingState extends ChangeNotifier {
   /// 加载画板
   void loadFile(String filePath) async {
     String? path = await Settings.getValue<String>(SettingsConfig.workspacePath, defaultValue: '');
-    if(path == null){
+    if (path == null) {
       return;
     }
 
@@ -358,7 +365,7 @@ class DrawingState extends ChangeNotifier {
 
     if (nowPageIndex >= 0 && nowPageIndex < drawingBoardData.length) {
       jsonDecode(drawingBoardData[nowPageIndex]).forEach((element) {
-        switch(element["type"]){
+        switch (element["type"]) {
           case "StraightLine":
             drawingController.addContent(StraightLine.fromJson(element));
             break;
@@ -384,6 +391,4 @@ class DrawingState extends ChangeNotifier {
     // 通知状态更新
     notifyListeners();
   }
-
 }
-
