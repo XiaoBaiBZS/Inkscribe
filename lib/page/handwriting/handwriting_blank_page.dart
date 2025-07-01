@@ -42,6 +42,7 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
 
   }
 
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -110,6 +111,7 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
   @override
   void dispose() {
     windowManager.removeListener(this);
+    drawingState.reset();
     super.dispose();
   }
 

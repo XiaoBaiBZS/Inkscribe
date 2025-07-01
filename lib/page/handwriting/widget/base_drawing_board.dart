@@ -1,6 +1,10 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_drawing_board/flutter_drawing_board.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:inksrcibe/config/settings_config.dart';
 import 'package:inksrcibe/page/handwriting/widget/drawing_state.dart';
+import 'package:inksrcibe/util/file_util.dart';
+import 'package:pdfrx/pdfrx.dart';
 import 'package:provider/provider.dart';
 
 /**
@@ -10,6 +14,9 @@ import 'package:provider/provider.dart';
  *@Version: 1.0
  */
 class BaseDrawingBoard extends StatefulWidget {
+
+
+
   @override
   State<BaseDrawingBoard> createState() => _BaseDrawingBoardState();
 }
@@ -29,6 +36,38 @@ class _BaseDrawingBoardState extends State<BaseDrawingBoard> {
   Widget build(BuildContext context) {
     // 获取绘图状态
     final drawingState = Provider.of<DrawingState>(context);
+
+    Future<Widget> buildDrawingBoardBackground() async {
+      print(drawingState.drawingBoardFile.type);
+      print(drawingState.drawingBoardFile.path);
+      String? path = await Settings.getValue<String>(SettingsConfig.workspacePath, defaultValue: '');
+      String pdfFileName = "${FileUtil.getFileName(drawingState.drawingBoardFile.path)}.pdf";
+      String pdfFilePath = "$path/$pdfFileName";
+      switch(drawingState.drawingBoardFile.type){
+        case "pdf":
+          return Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Color(0xff264b42),
+            child: PdfViewer.file(
+                pdfFilePath
+
+            ),
+          );
+        case "normal":
+          return Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Color(0xff264b42),
+          );
+        default:
+          return Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Color(0xff264b42),
+          );
+      }
+    }
 
     return Container(
       width: MediaQuery.of(context).size.width, // 获取窗口宽度
@@ -77,18 +116,25 @@ class _BaseDrawingBoardState extends State<BaseDrawingBoard> {
           //   });
           // },
           // 画布背景，这里是默认的黑板背景
-          background:
+          background: FutureBuilder(future: buildDrawingBoardBackground(), builder: (
+              BuildContext context,
+              AsyncSnapshot<Widget> snapshot
+              ){
+            return snapshot.hasData ? snapshot.data! : Container();
+          }),
+
+
               // SizedBox(
               //   width: MediaQuery.of(context).size.width,
               //   height: MediaQuery.of(context).size.height,
               //   // child:  PdfViewer.file("/storage/emulated/0/Download/WeiXin/你好.pdf"),
               //   child:  PdfViewer.file("C:/Users/12985/Downloads/你好.pdf"),
               // )
-              Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            color: Color(0xff264b42),
-          ),
+          //     Container(
+          //   width: MediaQuery.of(context).size.width,
+          //   height: MediaQuery.of(context).size.height,
+          //   color: Color(0xff264b42),
+          // ),
         ),
       ),
     );

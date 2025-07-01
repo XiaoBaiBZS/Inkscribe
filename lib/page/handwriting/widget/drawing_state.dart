@@ -93,6 +93,11 @@ class DrawingState extends ChangeNotifier {
   /// 当前画板文件相对路径
   String _filePath = '';
 
+  /// 获取画板数据
+  Future<DrawingBoardFile> getDrawingBoardData() async {
+    return drawingBoardFile;
+  }
+
   /// 恢复默认值，用于退出画板和重新加载画板
   void reset() {
     // 重置控制器内容，但保留控制器实例
