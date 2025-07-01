@@ -16,11 +16,27 @@ class MyBrowser extends StatefulWidget {
 }
 
 class MyBrowserState extends State<MyBrowser> {
+
+  PdfViewerController pdfViewerController = PdfViewerController();
+  @override
+  void initState() {
+
+
+    super.initState();
+    pdfViewerController.addListener(() {
+      print(pdfViewerController.pageNumber);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // body:PdfViewer.file("/storage/emulated/0/Download/WeiXin/你好.pdf"),
-      body:PdfViewer.file("C:/Users/12985/Downloads/你好.pdf"),
+
+      body:PdfViewer.file(
+          "C:/Users/12985/Downloads/使用Flutter框架构建精美的多端应用——以Windows平台为例.pdf",
+          controller:pdfViewerController
+      ),
     );
   }
 }

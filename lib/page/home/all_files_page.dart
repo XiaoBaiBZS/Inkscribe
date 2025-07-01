@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -738,6 +739,35 @@ class _AllFilesPageState extends State<AllFilesPage> {
     }
   }
 
+  /// 创建PDF文件画板
+  Future<void> _createPdfDrawingBoardFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'], // 限制只能选择PDF文件
+        allowMultiple: false,       // 禁止多选
+      );
+
+      if (result != null) {
+        print(result.files.single.path);
+
+        RouteUtils.pushForNamed(
+            context, RoutePath.handwriting_blank_page,
+            arguments: {
+              "path": nowNodePath,
+              "function": "create",
+              "type": "pdf",
+              "filePath": result.files.single.path
+            });
+      }
+    } catch (e) {
+      InfoBarUtil.showErrorInfoBar(context: context, title: "选择文件出错", message: "");
+    } finally {
+
+
+    }
+  }
+
   /// 加载首页笔记/封面
   Future<void> _loadFiles(String path) async {
     _fileSystemNode = [];
@@ -991,7 +1021,7 @@ class _AllFilesPageState extends State<AllFilesPage> {
                 icon: const Icon(FluentIcons.pdf),
                 label: const Text('从PDF创建'),
                 onPressed: () {
-                  // Create something new!
+                  _createPdfDrawingBoardFile();
                 },
               ),
               const CommandBarSeparator(),
@@ -1006,6 +1036,7 @@ class _AllFilesPageState extends State<AllFilesPage> {
           ),
         );
       }
+
 
       return LayoutBuilder(
         // 用于获取最大宽度，并根据最大宽度计算左右两个组件的占比宽度，目前是2:3的宽度比

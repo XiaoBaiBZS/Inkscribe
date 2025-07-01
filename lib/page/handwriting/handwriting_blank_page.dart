@@ -66,13 +66,30 @@ class _HandwritingBlankPageState extends State<HandwritingBlankPage> with Window
           if(args==null){
 
           }else{
+            print(args);
             if(args["function"]!=null || args["path"]==null){
+              // 创建页面方法
               switch(args["function"]){
+                // 加载页面
                 case "load":
                   drawingState.loadFile(args["path"]);
                   break;
+                // 新建页面
                 case "create":
-                  drawingState.createFile(args["path"]);
+                  switch(args["type"]??"blank"){
+                    // 新建空白页
+                    case "blank":
+                      drawingState.createFile(args["path"]);
+                      break;
+                    // 新建PDF页面
+                    case "pdf":
+                      if(args["filePath"] != null){
+                        drawingState.createPdfFile(args["path"],args["filePath"]);
+                        break;
+                      }else{
+                        InfoBarUtil.showErrorInfoBar(context: context, title: "未选择文件", message: "文件创建失败");
+                      }
+                  }
                   InfoBarUtil.showSuccessInfoBar(context: context, title: "开始你的书写", message: "文件创建成功");
                   break;
               }

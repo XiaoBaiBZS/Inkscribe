@@ -8,6 +8,7 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:path/path.dart' as path;
 
 class FileUtil {
   /// 检查并请求存储权限
@@ -284,6 +285,43 @@ class FileUtil {
     } catch (e) {
       print('移动文件夹错误: $e');
       rethrow;
+    }
+  }
+
+  /// 复制文件
+  static Future<void> copyFile(String sourcePath, String destinationPath) async {
+    try {
+      final sourceFile = File(sourcePath);
+
+      // 检查源文件是否存在
+      if (!await sourceFile.exists()) {
+        throw FileSystemException('源文件不存在', sourcePath);
+      }
+
+      // 复制文件
+      final destinationFile = await sourceFile.copy(destinationPath);
+      print('文件已复制到: ${destinationFile.path}');
+    } catch (e) {
+      print('复制文件时出错: $e');
+      rethrow;
+    }
+  }
+
+  /// 从文件路径中提取文件名（不包含文件扩展名）
+  static String getFileName(String filePath) {
+    try {
+      // 1. 去除路径中的多余分隔符并标准化
+      final normalizedPath = path.normalize(filePath);
+
+      // 2. 从路径中提取文件名（包含扩展名）
+      final fileNameWithExt = path.basename(normalizedPath);
+
+      // 3. 去除扩展名
+      return path.withoutExtension(fileNameWithExt);
+    } catch (e) {
+      // 错误处理：如果路径格式不正确，返回空字符串或原始路径
+      print('提取文件名时出错: $e');
+      return path.basename(filePath); // fallback返回包含扩展名的文件名
     }
   }
 }

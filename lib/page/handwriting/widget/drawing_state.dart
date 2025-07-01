@@ -194,6 +194,30 @@ class DrawingState extends ChangeNotifier {
     drawingBoardFile.saveFile();
   }
 
+  /// 创建PDF文件
+  void createPdfFile(String path, String filePath) async{
+    DateTime now = DateTime.now();
+    // 复制PDF文件到当前节点
+    // 修改PDF文件名称为“now.json”
+    String? workspacePath = Settings.getValue(SettingsConfig.workspacePath,defaultValue:  "");
+    FileUtil.copyFile(filePath, "$workspacePath$path/${now.millisecondsSinceEpoch}.pdf");
+    // 提取PDF文件的名称作为画板名称
+    String drawingBoardName = FileUtil.getFileName(filePath);
+    drawingBoardData.add(drawingController.getJsonList().toString());
+    drawingBoardFile = DrawingBoardFile(
+      name: drawingBoardName,
+      path: "$path/${now.millisecondsSinceEpoch}.json",
+      type: "pdf",
+      createDateTime: now,
+      data: drawingBoardData,
+    );
+    fileTreeManager.addFile(DrawingBoardFileConfig.fromDrawingBoardFile(drawingBoardFile), directoryPath: path);
+    fileTreeManager.writeToConfigFile();
+    drawingBoardData[nowPageIndex] = jsonEncode(drawingController.getJsonList());
+    notifyListeners();
+    drawingBoardFile.saveFile();
+  }
+
   /// 显示颜色选择器，用于"更多颜色"功能
   void showColorPicker(BuildContext context) {
     // 更新颜色历史记录
@@ -391,4 +415,6 @@ class DrawingState extends ChangeNotifier {
     // 通知状态更新
     notifyListeners();
   }
+
+
 }

@@ -24,8 +24,6 @@ class _MenuControllerButtonState extends State<MenuControllerButton> {
 
   late DrawingState drawingState;
 
-
-
   @override
   Widget build(BuildContext context) {
     /// 获取绘图状态
@@ -55,8 +53,9 @@ class _MenuControllerButtonState extends State<MenuControllerButton> {
           title: '保存退出',
           onPressed: () => handleMenuItemPress(() {
             drawingState.saveFile();
-            RouteUtils.pushNamedAndRemoveUntil(context, RoutePath.home_page);
-            drawingState.reset();
+            RouteUtils.pushNamedAndRemoveUntil(context, RoutePath.home_page).then((value){
+              drawingState.reset();
+            });
           }),
         ),
 
@@ -65,8 +64,9 @@ class _MenuControllerButtonState extends State<MenuControllerButton> {
           icon: FluentIcons.cancel,
           title: '不保存退出',
           onPressed: () => handleMenuItemPress(() {
-            RouteUtils.pushNamedAndRemoveUntil(context, RoutePath.home_page);
-            drawingState.reset();
+            RouteUtils.pushNamedAndRemoveUntil(context, RoutePath.home_page).then((value){
+              drawingState.reset();
+            });
           }),
         ),
 
