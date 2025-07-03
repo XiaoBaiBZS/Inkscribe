@@ -44,6 +44,7 @@ class _PageNumberNextButtonState extends State<PageNumberNextButton> {
           // 如果下一页的预计角标超出存储数据的列表长度，则给列表添加一项，否则则去本地文件中读取下一页数据
           setState(() {
             drawingState.nowPageIndex++;
+            drawingState.pdfViewerController.goToPage(pageNumber: drawingState.nowPageIndex+1);
           });
           if((drawingState.nowPageIndex)>(drawingState.drawingBoardData.length-1)){
             drawingState.drawingBoardData.add("");

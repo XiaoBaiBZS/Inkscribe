@@ -17,6 +17,7 @@ import 'package:inksrcibe/config/settings_config.dart';
 import 'package:inksrcibe/main.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:inksrcibe/util/file_util.dart';
+import 'package:pdfrx/pdfrx.dart';
 
 class DrawingState extends ChangeNotifier {
   // 私有静态实例映射，用于存储不同标识的实例
@@ -41,6 +42,8 @@ class DrawingState extends ChangeNotifier {
 
   /// 画布控制器
   DrawingController drawingController = DrawingController();
+
+  PdfViewerController pdfViewerController = PdfViewerController();
 
   /// 画布是否可以撤销或者重做
   bool canUndo = false;

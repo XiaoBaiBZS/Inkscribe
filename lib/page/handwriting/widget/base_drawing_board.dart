@@ -50,7 +50,7 @@ class _BaseDrawingBoardState extends State<BaseDrawingBoard> {
             height: MediaQuery.of(context).size.height,
             color: Color(0xff264b42),
             child: PdfViewer.file(
-                pdfFilePath
+              controller: drawingState.pdfViewerController , pdfFilePath
 
             ),
           );
